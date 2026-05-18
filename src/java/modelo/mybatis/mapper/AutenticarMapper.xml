@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="autentificar">
+
+    <!-- LOGIN ADMINISTRADOR -->
+    <select id="administrador" parameterType="map" resultType="pojo.Administrador">
+        SELECT
+            a.id_administrador AS idAdministrador,
+            a.numero_personal AS numeroPersonal,
+            a.contrasena AS contrasena,
+            a.id_usuario AS idUsuario,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_nacimiento AS "usuario.fechaNacimiento",
+            u.genero AS "usuario.genero",
+            u.domicilio AS "usuario.domicilio",
+            u.correo AS "usuario.correo",
+            u.telefono AS "usuario.telefono",
+            u.fotografia AS "usuario.fotografia",
+            u.id_rol AS "usuario.idRol",
+            u.id_estatus AS "usuario.idEstatus",
+
+            r.id_rol AS "usuario.rol.idRol",
+            r.nombre AS "usuario.rol.nombre",
+
+            eu.id_estatus AS "usuario.estatus.idEstatus",
+            eu.nombre AS "usuario.estatus.nombre"
+
+        FROM administrador a
+        INNER JOIN usuario u ON a.id_usuario = u.id_usuario
+        INNER JOIN rol r ON u.id_rol = r.id_rol
+        INNER JOIN estatus_usuario eu ON u.id_estatus = eu.id_estatus
+
+        WHERE a.numero_personal = #{numero_personal}
+          AND a.contrasena = #{contrasena}
+          AND u.id_rol = 1
+          AND eu.nombre = 'Activo';
+    </select>
+
+
+    <!-- LOGIN MÉDICO -->
+    <select id="medico" parameterType="map" resultType="pojo.Medico">
+        SELECT
+            m.id_medico AS idMedico,
+            m.numero_personal AS numeroPersonal,
+            m.cedula_profesional AS cedulaProfesional,
+            m.contrasena AS contrasena,
+            m.id_usuario AS idUsuario,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_nacimiento AS "usuario.fechaNacimiento",
+            u.genero AS "usuario.genero",
+            u.domicilio AS "usuario.domicilio",
+            u.correo AS "usuario.correo",
+            u.telefono AS "usuario.telefono",
+            u.fotografia AS "usuario.fotografia",
+            u.id_rol AS "usuario.idRol",
+            u.id_estatus AS "usuario.idEstatus",
+
+            r.id_rol AS "usuario.rol.idRol",
+            r.nombre AS "usuario.rol.nombre",
+
+            eu.id_estatus AS "usuario.estatus.idEstatus",
+            eu.nombre AS "usuario.estatus.nombre"
+
+        FROM medico m
+        INNER JOIN usuario u ON m.id_usuario = u.id_usuario
+        INNER JOIN rol r ON u.id_rol = r.id_rol
+        INNER JOIN estatus_usuario eu ON u.id_estatus = eu.id_estatus
+
+        WHERE m.numero_personal = #{numero_personal}
+          AND m.contrasena = #{contrasena}
+          AND u.id_rol = 2
+          AND eu.nombre = 'Activo';
+    </select>
+
+
+    <!-- LOGIN PACIENTE -->
+    <select id="paciente" parameterType="map" resultType="pojo.Paciente">
+        SELECT
+            p.id_paciente AS idPaciente,
+            p.codigo_acceso AS codigoAcceso,
+            p.id_usuario AS idUsuario,
+            p.id_medico AS idMedico,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_nacimiento AS "usuario.fechaNacimiento",
+            u.genero AS "usuario.genero",
+            u.domicilio AS "usuario.domicilio",
+            u.correo AS "usuario.correo",
+            u.telefono AS "usuario.telefono",
+            u.fotografia AS "usuario.fotografia",
+            u.id_rol AS "usuario.idRol",
+            u.id_estatus AS "usuario.idEstatus",
+
+            r.id_rol AS "usuario.rol.idRol",
+            r.nombre AS "usuario.rol.nombre",
+
+            eu.id_estatus AS "usuario.estatus.idEstatus",
+            eu.nombre AS "usuario.estatus.nombre",
+
+            med.id_medico AS "medico.idMedico",
+            med.numero_personal AS "medico.numeroPersonal",
+            med.cedula_profesional AS "medico.cedulaProfesional",
+            med.id_usuario AS "medico.idUsuario"
+
+        FROM paciente p
+        INNER JOIN usuario u ON p.id_usuario = u.id_usuario
+        INNER JOIN rol r ON u.id_rol = r.id_rol
+        INNER JOIN estatus_usuario eu ON u.id_estatus = eu.id_estatus
+        INNER JOIN medico med ON p.id_medico = med.id_medico
+
+        WHERE u.correo = #{correo}
+          AND p.codigo_acceso = #{codigo_acceso}
+          AND u.id_rol = 3
+          AND eu.nombre = 'Activo';
+    </select>
+
+</mapper>
