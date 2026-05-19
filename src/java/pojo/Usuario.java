@@ -7,7 +7,6 @@ public class Usuario {
     private String apellidoMaterno;
     private String fechaNacimiento;
     private String genero;
-    private String domicilio;
     private String correo;
     private String telefono;
     private byte[] fotografia; 
@@ -18,18 +17,20 @@ public class Usuario {
     
     private Integer idEstatus; 
     private EstatusUsuario estatus; 
-
+    
+    private Integer idDomicilio;
+    private Domicilio domicilio;
+    
     public Usuario() {
     }
 
-    public Usuario(Integer idUsuario, String nombre, String apellidoPaterno, String apellidoMaterno, String fechaNacimiento, String genero, String domicilio, String correo, String telefono, byte[] fotografia, String fotoBase64, Integer idRol, Rol rol, Integer idEstatus, EstatusUsuario estatus) {
+    public Usuario(Integer idUsuario, String nombre, String apellidoPaterno, String apellidoMaterno, String fechaNacimiento, String genero, String correo, String telefono, byte[] fotografia, String fotoBase64, Integer idRol, Rol rol, Integer idEstatus, EstatusUsuario estatus, Integer idDomicilio, Domicilio domicilio) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
         this.apellidoMaterno = apellidoMaterno;
         this.fechaNacimiento = fechaNacimiento;
         this.genero = genero;
-        this.domicilio = domicilio;
         this.correo = correo;
         this.telefono = telefono;
         this.fotografia = fotografia;
@@ -38,6 +39,8 @@ public class Usuario {
         this.rol = rol;
         this.idEstatus = idEstatus;
         this.estatus = estatus;
+        this.idDomicilio = idDomicilio;
+        this.domicilio = domicilio;
     }
 
     public Integer getIdUsuario() {
@@ -86,14 +89,6 @@ public class Usuario {
 
     public void setGenero(String genero) {
         this.genero = genero;
-    }
-
-    public String getDomicilio() {
-        return domicilio;
-    }
-
-    public void setDomicilio(String domicilio) {
-        this.domicilio = domicilio;
     }
 
     public String getCorreo() {
@@ -160,5 +155,21 @@ public class Usuario {
         this.estatus = estatus;
     }
 
-   
+    public Integer getIdDomicilio() {
+        return idDomicilio;
+    }
+
+    public void setIdDomicilio(Integer idDomicilio) {
+        this.idDomicilio = idDomicilio;
+    }
+
+    public Domicilio getDomicilio() {
+        return domicilio;
+    }
+
+    public void setDomicilio(Domicilio domicilio) {
+        this.domicilio = domicilio;
+    }
+
+    
 }

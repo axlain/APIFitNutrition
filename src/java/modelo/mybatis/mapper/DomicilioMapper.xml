@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="domicilio">
+
+    <!-- ========================================= -->
+    <!-- REGISTRAR DOMICILIO -->
+    <!-- ========================================= -->
+    <insert id="registrar" parameterType="pojo.Domicilio" useGeneratedKeys="true" keyProperty="idDomicilio">
+        INSERT INTO domicilio (
+            calle,
+            numero_exterior,
+            colonia,
+            municipio,
+            estado,
+            codigo_postal
+        )
+        VALUES (
+            #{calle},
+            #{numeroExterior},
+            #{colonia},
+            #{municipio},
+            #{estado},
+            #{codigoPostal}
+        );
+    </insert>
+
+    <!-- ========================================= -->
+    <!-- OBTENER DOMICILIO POR ID -->
+    <!-- ========================================= -->
+    <select id="obtener-por-id" parameterType="int" resultType="pojo.Domicilio">
+        SELECT
+            id_domicilio AS idDomicilio,
+            calle,
+            numero_exterior AS numeroExterior,
+            colonia,
+            municipio,
+            estado,
+            codigo_postal AS codigoPostal
+        FROM domicilio
+        WHERE id_domicilio = #{idDomicilio};
+    </select>
+
+    <!-- ========================================= -->
+    <!-- OBTENER EL ÚLTIMO ID INSERTADO -->
+    <!-- ========================================= -->
+    <select id="obtener-id-ultimo" resultType="int">
+        SELECT LAST_INSERT_ID();
+    </select>
+
+    <!-- ========================================= -->
+    <!-- EDITAR DOMICILIO -->
+    <!-- ========================================= -->
+    <update id="editar" parameterType="pojo.Domicilio">
+        UPDATE domicilio
+        SET
+            calle = #{calle},
+            numero_exterior = #{numeroExterior},
+            colonia = #{colonia},
+            municipio = #{municipio},
+            estado = #{estado},
+            codigo_postal = #{codigoPostal}
+        WHERE id_domicilio = #{idDomicilio};
+    </update>
+
+    <!-- ========================================= -->
+    <!-- ELIMINAR DOMICILIO -->
+    <!-- ========================================= -->
+    <delete id="eliminar" parameterType="int">
+        DELETE FROM domicilio
+        WHERE id_domicilio = #{idDomicilio};
+    </delete>
+
+    <!-- ========================================= -->
+    <!-- OBTENER TODOS LOS DOMICILIOS -->
+    <!-- ========================================= -->
+    <select id="obtener-todos" resultType="pojo.Domicilio">
+        SELECT
+            id_domicilio AS idDomicilio,
+            calle,
+            numero_exterior AS numeroExterior,
+            colonia,
+            municipio,
+            estado,
+            codigo_postal AS codigoPostal
+        FROM domicilio
+        ORDER BY id_domicilio ASC;
+    </select>
+
+</mapper>

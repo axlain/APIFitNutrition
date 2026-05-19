@@ -28,7 +28,9 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(ws.AdministradorWS.class);
         resources.add(ws.AutenticarWS.class);
+        resources.add(ws.DomicilioWS.class);
         resources.add(ws.MedicoWS.class);
     }
     

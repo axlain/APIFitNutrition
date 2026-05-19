@@ -2,7 +2,6 @@ package ws;
 
 import com.google.gson.Gson;
 import dominio.AdministradorImp;
-import dominio.MedicoImp;
 import dto.Respuesta;
 import java.util.List;
 import javax.ws.rs.BadRequestException;
@@ -16,17 +15,23 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import pojo.Medico;
+import pojo.Administrador;
 
-@Path("medico")
-public class MedicoWS {
+@Path("administrador")
+public class AdministradorWS {
+    // =========================================
+    // OBTENER TODOS LOS ADMINISTRADORES
+    // =========================================
     @Path("obtener-todos")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Medico> obtenerTodos() {
-        return MedicoImp.obtenerTodos();
+    public List<Administrador> obtenerTodos() {
+        return AdministradorImp.obtenerTodos();
     }
 
+    // =========================================
+    // REGISTRAR ADMINISTRADOR
+    // =========================================
     @Path("registrar")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -34,13 +39,16 @@ public class MedicoWS {
     public Respuesta registrar(String json) {
         Gson gson = new Gson();
         try {
-            Medico medico = gson.fromJson(json, Medico.class);
-            return MedicoImp.registrar(medico);
+            Administrador admin = gson.fromJson(json, Administrador.class);
+            return AdministradorImp.registrar(admin);
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
     }
 
+    // =========================================
+    // EDITAR ADMINISTRADOR (sin cambiar contraseña)
+    // =========================================
     @Path("editar")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
@@ -48,29 +56,16 @@ public class MedicoWS {
     public Respuesta editar(String json) {
         Gson gson = new Gson();
         try {
-            Medico medico = gson.fromJson(json, Medico.class);
-            return MedicoImp.editar(medico);
+            Administrador admin = gson.fromJson(json, Administrador.class);
+            return AdministradorImp.editar(admin);
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
     }
 
-    @Path("dar-baja/{idMedico}")
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    public Respuesta darBaja(@PathParam("idMedico") Integer idMedico) {
-        if (idMedico == null || idMedico <= 0) throw new BadRequestException();
-        return MedicoImp.darBaja(idMedico);
-    }
-
-    @Path("buscar")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Medico> buscar(@QueryParam("filtro") String filtro) {
-        if (filtro == null) filtro = "";
-        return MedicoImp.buscar(filtro);
-    }
-    
+    // =========================================
+    // CAMBIAR CONTRASEÑA DE ADMINISTRADOR
+    // =========================================
     @Path("cambiar-contrasena")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
@@ -84,7 +79,7 @@ public class MedicoWS {
                 public String nuevaContrasena;
             }
             Cambio cambio = gson.fromJson(json, Cambio.class);
-            return MedicoImp.cambiarContrasena(
+            return AdministradorImp.cambiarContrasena(
                     cambio.idAdministrador,
                     cambio.contrasenaActual,
                     cambio.nuevaContrasena

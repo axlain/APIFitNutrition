@@ -4,23 +4,19 @@
 
 <mapper namespace="usuario">
 
-    <!-- ========================================= -->
-    <!-- REGISTRAR USUARIO -->
-    <!-- ========================================= -->
     <insert id="registrar" parameterType="pojo.Usuario">
-
         INSERT INTO usuario (
             nombre,
             apellido_paterno,
             apellido_materno,
             fecha_nacimiento,
             genero,
-            domicilio,
             correo,
             telefono,
             fotografia,
             id_rol,
-            id_estatus
+            id_estatus,
+            id_domicilio
         )
         VALUES (
             #{nombre},
@@ -28,22 +24,19 @@
             #{apellidoMaterno},
             #{fechaNacimiento},
             #{genero},
-            #{domicilio},
             #{correo},
             #{telefono},
             #{fotografia},
             #{idRol},
-            #{idEstatus}
+            #{idEstatus},
+            #{idDomicilio}
         );
-
     </insert>
-
 
     <!-- ========================================= -->
     <!-- EDITAR USUARIO -->
     <!-- ========================================= -->
     <update id="editar" parameterType="pojo.Usuario">
-
         UPDATE usuario
         SET
             nombre = #{nombre},
@@ -51,11 +44,13 @@
             apellido_materno = #{apellidoMaterno},
             fecha_nacimiento = #{fechaNacimiento},
             genero = #{genero},
-            domicilio = #{domicilio},
             correo = #{correo},
-            telefono = #{telefono}
+            telefono = #{telefono},
+            fotografia = #{fotografia},
+            id_rol = #{idRol},
+            id_estatus = #{idEstatus},
+            id_domicilio = #{idDomicilio}
         WHERE id_usuario = #{idUsuario};
-
     </update>
 
 

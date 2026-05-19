@@ -74,14 +74,10 @@
     <!-- EDITAR MÉDICO -->
     <!-- ========================================= -->
     <update id="editar" parameterType="pojo.Medico">
-
         UPDATE medico
         SET
-            numero_personal = #{numeroPersonal},
-            cedula_profesional = #{cedulaProfesional},
-            contrasena = #{contrasena}
+            id_usuario = #{idUsuario}
         WHERE id_medico = #{idMedico};
-
     </update>
 
 
@@ -246,5 +242,18 @@
         ORDER BY u.nombre ASC;
 
     </select>
+    
+    <!-- Verificar contraseña actual -->
+    <select id="verificar-contrasena" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM medico
+        WHERE id_medico = #{idMedico} AND contrasena = #{contrasenaActual}
+    </select>
 
+    <!-- Cambiar contraseña -->
+    <update id="cambiar-contrasena" parameterType="map">
+        UPDATE medico
+        SET contrasena = #{nuevaContrasena}
+        WHERE id_medico = #{idMedico}
+    </update>
 </mapper>

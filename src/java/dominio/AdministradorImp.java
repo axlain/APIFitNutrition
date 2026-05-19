@@ -2,23 +2,23 @@ package dominio;
 
 import dto.Respuesta;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import modelo.mybatis.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
+import pojo.Administrador;
 import pojo.Medico;
 import pojo.Usuario;
 import utilidades.Constantes;
 
-public class MedicoImp {
-
-    public static List<Medico> obtenerTodos() {
-        List<Medico> medicos = null;
+public class AdministradorImp {
+    
+    public static List<Administrador> obtenerTodos() {
+        List<Administrador> administradores = null;
         SqlSession conexionBD = MyBatisUtil.getSession();
         if (conexionBD != null) {
             try {
-                medicos = conexionBD.selectList(
-                        "medico.obtener-activos"
+                administradores = conexionBD.selectList(
+                        "administrador.obtener-todos"
                 );
             } catch (Exception e) {
                 e.printStackTrace();
@@ -27,24 +27,24 @@ public class MedicoImp {
             }
         }
 
-        return medicos;
+        return administradores;
     }
-
-    public static Respuesta registrar(Medico medico) {
+    
+    public static Respuesta registrar(Administrador admin) {
         Respuesta respuesta = new Respuesta();
         SqlSession conexionBD = MyBatisUtil.getSession();
 
         if (conexionBD != null) {
             try {
                 // 1. Registrar domicilio primero
-                conexionBD.insert("domicilio.registrar", medico.getUsuario().getDomicilio());
+                conexionBD.insert("domicilio.registrar", admin.getUsuario().getDomicilio());
                 Integer idDomicilio = conexionBD.selectOne("domicilio.obtener-id-ultimo");
-                medico.getUsuario().setIdDomicilio(idDomicilio);
+                admin.getUsuario().setIdDomicilio(idDomicilio);
 
                 // 2. Verificar correo
                 Integer existeCorreo = conexionBD.selectOne(
                         "usuario.verificar-correo",
-                        medico.getUsuario().getCorreo()
+                        admin.getUsuario().getCorreo()
                 );
                 if (existeCorreo > 0) {
                     respuesta.setError(true);
@@ -57,40 +57,40 @@ public class MedicoImp {
                 String numeroPersonal = "";
                 while (!numeroValido) {
                     numeroPersonal = utilidades.GeneradorNumeroPersonal.generarNumeroPersonal(
-                            "MEDICO",
-                            medico.getUsuario().getNombre(),
-                            medico.getUsuario().getApellidoPaterno(),
-                            medico.getUsuario().getApellidoMaterno()
+                            "ADMINISTRADOR",
+                            admin.getUsuario().getNombre(),
+                            admin.getUsuario().getApellidoPaterno(),
+                            admin.getUsuario().getApellidoMaterno()
                     );
                     Integer existeNumero = conexionBD.selectOne(
-                            "medico.verificar-numero-personal",
+                            "administrador.verificar-numero-personal",
                             numeroPersonal
                     );
                     if (existeNumero == 0) {
                         numeroValido = true;
                     }
                 }
-                medico.setNumeroPersonal(numeroPersonal);
+                admin.setNumeroPersonal(numeroPersonal);
 
                 // 4. Registrar usuario
-                conexionBD.insert("usuario.registrar", medico.getUsuario());
+                conexionBD.insert("usuario.registrar", admin.getUsuario());
                 Integer idUsuario = conexionBD.selectOne(
                         "usuario.obtener-id-por-correo",
-                        medico.getUsuario().getCorreo()
+                        admin.getUsuario().getCorreo()
                 );
-                medico.setIdUsuario(idUsuario);
+                admin.setIdUsuario(idUsuario);
 
-                // 5. Registrar médico
-                conexionBD.insert("medico.registrar", medico);
+                // 5. Registrar administrador
+                conexionBD.insert("administrador.registrar", admin);
 
                 conexionBD.commit();
                 respuesta.setError(false);
-                respuesta.setMensaje("Médico registrado correctamente. Número personal: " + numeroPersonal);
+                respuesta.setMensaje("Administrador registrado correctamente. Número personal: " + numeroPersonal);
 
             } catch (Exception e) {
                 conexionBD.rollback();
                 respuesta.setError(true);
-                respuesta.setMensaje("Error al registrar médico: " + e.getMessage());
+                respuesta.setMensaje("Error al registrar administrador: " + e.getMessage());
             } finally {
                 conexionBD.close();
             }
@@ -102,26 +102,26 @@ public class MedicoImp {
         return respuesta;
     }
 
-    public static Respuesta editar(Medico medico) {
+    public static Respuesta editar(Administrador admin) {
         Respuesta respuesta = new Respuesta();
         SqlSession conexionBD = MyBatisUtil.getSession();
 
         if (conexionBD != null) {
             try {
-                // Editar solo los datos del usuario asociado
-                conexionBD.update("usuario.editar", medico.getUsuario());
+                // Solo se editan los datos del usuario
+                conexionBD.update("usuario.editar", admin.getUsuario());
 
-                // Editar médico, sin modificar numeroPersonal, cedulaProfesional ni contrasena
-                conexionBD.update("medico.editar", medico);
+                // Administrador no se edita numeroPersonal ni contrasena
+                conexionBD.update("administrador.editar", admin);
 
                 conexionBD.commit();
                 respuesta.setError(false);
-                respuesta.setMensaje("Médico editado correctamente.");
+                respuesta.setMensaje("Administrador editado correctamente (sin modificar contraseña ni número personal).");
 
             } catch (Exception e) {
                 conexionBD.rollback();
                 respuesta.setError(true);
-                respuesta.setMensaje("Error al editar médico: " + e.getMessage());
+                respuesta.setMensaje("Error al editar administrador: " + e.getMessage());
             } finally {
                 conexionBD.close();
             }
@@ -132,80 +132,12 @@ public class MedicoImp {
 
         return respuesta;
     }
-    public static List<Medico> buscar(String filtro) {
 
-        List<Medico> medicos = null;
-
-        SqlSession conexionBD = MyBatisUtil.getSession();
-
-        if (conexionBD != null) {
-
-            try {
-
-                medicos = conexionBD.selectList(
-                        "medico.buscar",
-                        filtro
-                );
-
-            } catch (Exception e) {
-
-                e.printStackTrace();
-
-            } finally {
-
-                conexionBD.close();
-            }
-        }
-
-        return medicos;
-    }
-
-    public static Respuesta darBaja(Integer idMedico) {
-
-        Respuesta respuesta = new Respuesta();
-
-        SqlSession conexionBD = MyBatisUtil.getSession();
-
-        if (conexionBD != null) {
-
-            try {
-
-                conexionBD.update(
-                        "medico.dar-baja",
-                        idMedico
-                );
-
-                conexionBD.commit();
-
-                respuesta.setError(false);
-                respuesta.setMensaje("Médico dado de baja correctamente.");
-
-            } catch (Exception e) {
-
-                conexionBD.rollback();
-
-                respuesta.setError(true);
-                respuesta.setMensaje("Error al dar de baja: " + e.getMessage());
-
-            } finally {
-
-                conexionBD.close();
-            }
-
-        } else {
-
-            respuesta.setError(true);
-            respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
-        }
-
-        return respuesta;
-    }
-    
-    public static Respuesta cambiarContrasena(Integer idMedico, String contrasenaActual, String nuevaContrasena) {
+    public static Respuesta cambiarContrasena(Integer idAdmin, String contrasenaActual, String nuevaContrasena) {
         Respuesta respuesta = new Respuesta();
         respuesta.setError(true);
 
-        if (idMedico == null || idMedico <= 0 || contrasenaActual == null || contrasenaActual.isEmpty()
+        if (idAdmin == null || idAdmin <= 0 || contrasenaActual == null || contrasenaActual.isEmpty()
                 || nuevaContrasena == null || nuevaContrasena.isEmpty()) {
             respuesta.setMensaje("Datos inválidos");
             return respuesta;
@@ -216,19 +148,20 @@ public class MedicoImp {
         if (conexionBD != null) {
             try {
                 HashMap<String, Object> parametrosVerificacion = new HashMap<>();
-                parametrosVerificacion.put("idMedico", idMedico);
+                parametrosVerificacion.put("idAdministrador", idAdmin);
                 parametrosVerificacion.put("contrasenaActual", contrasenaActual);
 
-                int existe = conexionBD.selectOne("medico.verificar-contrasena", parametrosVerificacion);
+                // Verificar la contraseña actual
+                Integer existe = conexionBD.selectOne("administrador.verificar-contrasena", parametrosVerificacion);
 
                 if (existe == 0) {
                     respuesta.setMensaje("La contraseña actual es incorrecta.");
                 } else {
                     HashMap<String, Object> parametrosUpdate = new HashMap<>();
-                    parametrosUpdate.put("idMedico", idMedico);
+                    parametrosUpdate.put("idAdministrador", idAdmin);
                     parametrosUpdate.put("nuevaContrasena", nuevaContrasena);
 
-                    conexionBD.update("medico.cambiar-contrasena", parametrosUpdate);
+                    conexionBD.update("administrador.cambiar-contrasena", parametrosUpdate);
                     conexionBD.commit();
 
                     respuesta.setError(false);
