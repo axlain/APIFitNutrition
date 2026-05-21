@@ -3,7 +3,9 @@
 
 <mapper namespace="autentificar">
 
+    <!-- ========================================= -->
     <!-- LOGIN ADMINISTRADOR -->
+    <!-- ========================================= -->
     <select id="administrador" parameterType="map" resultType="pojo.Administrador">
         SELECT
             a.id_administrador AS idAdministrador,
@@ -17,23 +19,32 @@
             u.apellido_materno AS "usuario.apellidoMaterno",
             u.fecha_nacimiento AS "usuario.fechaNacimiento",
             u.genero AS "usuario.genero",
-            u.domicilio AS "usuario.domicilio",
             u.correo AS "usuario.correo",
             u.telefono AS "usuario.telefono",
             u.fotografia AS "usuario.fotografia",
             u.id_rol AS "usuario.idRol",
             u.id_estatus AS "usuario.idEstatus",
+            u.id_domicilio AS "usuario.idDomicilio",
 
             r.id_rol AS "usuario.rol.idRol",
             r.nombre AS "usuario.rol.nombre",
 
             eu.id_estatus AS "usuario.estatus.idEstatus",
-            eu.nombre AS "usuario.estatus.nombre"
+            eu.nombre AS "usuario.estatus.nombre",
+
+            d.id_domicilio AS "usuario.domicilio.idDomicilio",
+            d.calle AS "usuario.domicilio.calle",
+            d.numero_exterior AS "usuario.domicilio.numeroExterior",
+            d.colonia AS "usuario.domicilio.colonia",
+            d.municipio AS "usuario.domicilio.municipio",
+            d.estado AS "usuario.domicilio.estado",
+            d.codigo_postal AS "usuario.domicilio.codigoPostal"
 
         FROM administrador a
         INNER JOIN usuario u ON a.id_usuario = u.id_usuario
         INNER JOIN rol r ON u.id_rol = r.id_rol
         INNER JOIN estatus_usuario eu ON u.id_estatus = eu.id_estatus
+        LEFT JOIN domicilio d ON u.id_domicilio = d.id_domicilio
 
         WHERE a.numero_personal = #{numero_personal}
           AND a.contrasena = #{contrasena}
@@ -42,7 +53,9 @@
     </select>
 
 
+    <!-- ========================================= -->
     <!-- LOGIN MÉDICO -->
+    <!-- ========================================= -->
     <select id="medico" parameterType="map" resultType="pojo.Medico">
         SELECT
             m.id_medico AS idMedico,
@@ -57,23 +70,32 @@
             u.apellido_materno AS "usuario.apellidoMaterno",
             u.fecha_nacimiento AS "usuario.fechaNacimiento",
             u.genero AS "usuario.genero",
-            u.domicilio AS "usuario.domicilio",
             u.correo AS "usuario.correo",
             u.telefono AS "usuario.telefono",
             u.fotografia AS "usuario.fotografia",
             u.id_rol AS "usuario.idRol",
             u.id_estatus AS "usuario.idEstatus",
+            u.id_domicilio AS "usuario.idDomicilio",
 
             r.id_rol AS "usuario.rol.idRol",
             r.nombre AS "usuario.rol.nombre",
 
             eu.id_estatus AS "usuario.estatus.idEstatus",
-            eu.nombre AS "usuario.estatus.nombre"
+            eu.nombre AS "usuario.estatus.nombre",
+
+            d.id_domicilio AS "usuario.domicilio.idDomicilio",
+            d.calle AS "usuario.domicilio.calle",
+            d.numero_exterior AS "usuario.domicilio.numeroExterior",
+            d.colonia AS "usuario.domicilio.colonia",
+            d.municipio AS "usuario.domicilio.municipio",
+            d.estado AS "usuario.domicilio.estado",
+            d.codigo_postal AS "usuario.domicilio.codigoPostal"
 
         FROM medico m
         INNER JOIN usuario u ON m.id_usuario = u.id_usuario
         INNER JOIN rol r ON u.id_rol = r.id_rol
         INNER JOIN estatus_usuario eu ON u.id_estatus = eu.id_estatus
+        LEFT JOIN domicilio d ON u.id_domicilio = d.id_domicilio
 
         WHERE m.numero_personal = #{numero_personal}
           AND m.contrasena = #{contrasena}
@@ -82,7 +104,9 @@
     </select>
 
 
+    <!-- ========================================= -->
     <!-- LOGIN PACIENTE -->
+    <!-- ========================================= -->
     <select id="paciente" parameterType="map" resultType="pojo.Paciente">
         SELECT
             p.id_paciente AS idPaciente,
@@ -96,18 +120,26 @@
             u.apellido_materno AS "usuario.apellidoMaterno",
             u.fecha_nacimiento AS "usuario.fechaNacimiento",
             u.genero AS "usuario.genero",
-            u.domicilio AS "usuario.domicilio",
             u.correo AS "usuario.correo",
             u.telefono AS "usuario.telefono",
             u.fotografia AS "usuario.fotografia",
             u.id_rol AS "usuario.idRol",
             u.id_estatus AS "usuario.idEstatus",
+            u.id_domicilio AS "usuario.idDomicilio",
 
             r.id_rol AS "usuario.rol.idRol",
             r.nombre AS "usuario.rol.nombre",
 
             eu.id_estatus AS "usuario.estatus.idEstatus",
             eu.nombre AS "usuario.estatus.nombre",
+
+            d.id_domicilio AS "usuario.domicilio.idDomicilio",
+            d.calle AS "usuario.domicilio.calle",
+            d.numero_exterior AS "usuario.domicilio.numeroExterior",
+            d.colonia AS "usuario.domicilio.colonia",
+            d.municipio AS "usuario.domicilio.municipio",
+            d.estado AS "usuario.domicilio.estado",
+            d.codigo_postal AS "usuario.domicilio.codigoPostal",
 
             med.id_medico AS "medico.idMedico",
             med.numero_personal AS "medico.numeroPersonal",
@@ -118,6 +150,7 @@
         INNER JOIN usuario u ON p.id_usuario = u.id_usuario
         INNER JOIN rol r ON u.id_rol = r.id_rol
         INNER JOIN estatus_usuario eu ON u.id_estatus = eu.id_estatus
+        LEFT JOIN domicilio d ON u.id_domicilio = d.id_domicilio
         INNER JOIN medico med ON p.id_medico = med.id_medico
 
         WHERE u.correo = #{correo}
