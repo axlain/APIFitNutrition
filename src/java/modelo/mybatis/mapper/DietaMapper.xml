@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dieta">
+
+    <select id="obtener-todas" resultType="pojo.Dieta">
+        SELECT
+            id_dieta AS idDieta,
+            nombre,
+            total_calorias AS totalCalorias,
+            observaciones,
+            asignada,
+            id_medico AS idMedico
+        FROM dieta
+        ORDER BY nombre ASC;
+    </select>
+
+    <select id="buscar" parameterType="string" resultType="pojo.Dieta">
+        SELECT
+            id_dieta AS idDieta,
+            nombre,
+            total_calorias AS totalCalorias,
+            observaciones,
+            asignada,
+            id_medico AS idMedico
+        FROM dieta
+        WHERE nombre LIKE CONCAT('%', #{filtro}, '%')
+        ORDER BY nombre ASC;
+    </select>
+
+    <select id="obtener-por-id" parameterType="int" resultType="pojo.Dieta">
+        SELECT
+            id_dieta AS idDieta,
+            nombre,
+            total_calorias AS totalCalorias,
+            observaciones,
+            asignada,
+            id_medico AS idMedico
+        FROM dieta
+        WHERE id_dieta = #{idDieta};
+    </select>
+
+    <insert id="registrar" parameterType="pojo.Dieta"
+            useGeneratedKeys="true"
+            keyProperty="idDieta"
+            keyColumn="id_dieta">
+        INSERT INTO dieta (
+            nombre,
+            total_calorias,
+            observaciones,
+            asignada,
+            id_medico
+        )
+        VALUES (
+            #{nombre},
+            0,
+            #{observaciones},
+            0,
+            #{idMedico}
+        );
+    </insert>
+
+    <update id="editar" parameterType="pojo.Dieta">
+        UPDATE dieta
+        SET
+            nombre = #{nombre},
+            observaciones = #{observaciones}
+        WHERE id_dieta = #{idDieta};
+    </update>
+
+    <select id="verificar-dieta-en-uso" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM consulta
+        WHERE id_dieta = #{idDieta};
+    </select>
+
+</mapper>

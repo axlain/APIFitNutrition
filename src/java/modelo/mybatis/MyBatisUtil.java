@@ -8,8 +8,8 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 public class MyBatisUtil {
-    private static final String RESOURCE="modelo/mybatis/mybatis-config.xml";
-    private static final String ENVIROMENT="desarrollo"; 
+    private static final String RESOURCE = "modelo/mybatis/mybatis-config.xml";
+    private static final String ENVIROMENT = "desarrollo"; 
     
     public static SqlSession getSession(){
         SqlSession session= null; 

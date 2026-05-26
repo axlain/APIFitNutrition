@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dietaAlimento">
+
+    <select id="obtener-por-dieta" parameterType="int" resultType="pojo.DietaAlimento">
+        SELECT
+            da.id_dieta_alimento AS idDietaAlimento,
+            da.cantidad AS cantidad,
+            da.id_dieta AS idDieta,
+            da.id_alimento AS idAlimento,
+            da.id_segmento AS idSegmentoDia,
+
+            a.id_alimento AS "alimento.idAlimento",
+            a.nombre AS "alimento.nombre",
+            a.porcion AS "alimento.porcion",
+            a.calorias_por_porcion AS "alimento.caloriasPorPorcion",
+            a.id_unidad_porcion AS "alimento.idUnidadPorcion",
+
+            up.id_unidad_porcion AS "alimento.unidadPorcion.idUnidadPorcion",
+            up.nombre AS "alimento.unidadPorcion.nombre",
+
+            sd.id_segmento AS "segmentoDia.idSegmento",
+            sd.nombre AS "segmentoDia.nombre"
+
+        FROM dieta_alimento da
+        INNER JOIN alimento a 
+            ON da.id_alimento = a.id_alimento
+        INNER JOIN unidad_porcion up
+            ON a.id_unidad_porcion = up.id_unidad_porcion
+        INNER JOIN segmento_dia sd 
+            ON da.id_segmento = sd.id_segmento
+        WHERE da.id_dieta = #{idDieta}
+        ORDER BY sd.nombre ASC, a.nombre ASC;
+    </select>
+
+    <select id="obtener-por-id" parameterType="int" resultType="pojo.DietaAlimento">
+        SELECT
+            da.id_dieta_alimento AS idDietaAlimento,
+            da.cantidad AS cantidad,
+            da.id_dieta AS idDieta,
+            da.id_alimento AS idAlimento,
+            da.id_segmento AS idSegmentoDia,
+
+            a.id_alimento AS "alimento.idAlimento",
+            a.nombre AS "alimento.nombre",
+            a.porcion AS "alimento.porcion",
+            a.calorias_por_porcion AS "alimento.caloriasPorPorcion",
+            a.id_unidad_porcion AS "alimento.idUnidadPorcion",
+
+            up.id_unidad_porcion AS "alimento.unidadPorcion.idUnidadPorcion",
+            up.nombre AS "alimento.unidadPorcion.nombre",
+
+            sd.id_segmento AS "segmentoDia.idSegmento",
+            sd.nombre AS "segmentoDia.nombre"
+
+        FROM dieta_alimento da
+        INNER JOIN alimento a 
+            ON da.id_alimento = a.id_alimento
+        INNER JOIN unidad_porcion up
+            ON a.id_unidad_porcion = up.id_unidad_porcion
+        INNER JOIN segmento_dia sd 
+            ON da.id_segmento = sd.id_segmento
+        WHERE da.id_dieta_alimento = #{idDietaAlimento};
+    </select>
+
+    <insert id="registrar" parameterType="pojo.DietaAlimento"
+            useGeneratedKeys="true"
+            keyProperty="idDietaAlimento"
+            keyColumn="id_dieta_alimento">
+        INSERT INTO dieta_alimento (
+            cantidad,
+            id_dieta,
+            id_alimento,
+            id_segmento
+        )
+        VALUES (
+            #{cantidad},
+            #{idDieta},
+            #{idAlimento},
+            #{idSegmentoDia}
+        );
+    </insert>
+
+    <update id="editar" parameterType="pojo.DietaAlimento">
+        UPDATE dieta_alimento
+        SET
+            cantidad = #{cantidad},
+            id_alimento = #{idAlimento},
+            id_segmento = #{idSegmentoDia}
+        WHERE id_dieta_alimento = #{idDietaAlimento};
+    </update>
+
+    <delete id="eliminar" parameterType="int">
+        DELETE FROM dieta_alimento
+        WHERE id_dieta_alimento = #{idDietaAlimento};
+    </delete>
+
+    <delete id="eliminar-por-dieta" parameterType="int">
+        DELETE FROM dieta_alimento
+        WHERE id_dieta = #{idDieta};
+    </delete>
+
+    <select id="obtener-id-dieta" parameterType="int" resultType="int">
+        SELECT id_dieta
+        FROM dieta_alimento
+        WHERE id_dieta_alimento = #{idDietaAlimento};
+    </select>
+
+    <select id="verificar-dieta-en-uso" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM consulta
+        WHERE id_dieta = #{idDieta};
+    </select>
+
+    <update id="recalcular-calorias-dieta" parameterType="int">
+        UPDATE dieta d
+        SET d.total_calorias = (
+            SELECT IFNULL(SUM(a.calorias_por_porcion * da.cantidad), 0)
+            FROM dieta_alimento da
+            INNER JOIN alimento a 
+                ON da.id_alimento = a.id_alimento
+            WHERE da.id_dieta = #{idDieta}
+        )
+        WHERE d.id_dieta = #{idDieta};
+    </update>
+
+</mapper>

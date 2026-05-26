@@ -1,19 +1,29 @@
 package pojo;
 
+import java.util.List;
+
 public class Dieta {
+
     private Integer idDieta;
     private String nombre;
     private Double totalCalorias;
     private String observaciones;
     private Boolean asignada;
-    
+
     private Integer idMedico;
-    private Medico medico; 
+    private Medico medico;
+
+    // LISTA DE ALIMENTOS DE LA DIETA
+    private List<DietaAlimento> alimentos;
 
     public Dieta() {
     }
 
-    public Dieta(Integer idDieta, String nombre, Double totalCalorias, String observaciones, Boolean asignada, Integer idMedico, Medico medico) {
+    public Dieta(Integer idDieta, String nombre, Double totalCalorias,
+            String observaciones, Boolean asignada,
+            Integer idMedico, Medico medico,
+            List<DietaAlimento> alimentos) {
+
         this.idDieta = idDieta;
         this.nombre = nombre;
         this.totalCalorias = totalCalorias;
@@ -21,6 +31,7 @@ public class Dieta {
         this.asignada = asignada;
         this.idMedico = idMedico;
         this.medico = medico;
+        this.alimentos = alimentos;
     }
 
     public Integer getIdDieta() {
@@ -78,6 +89,12 @@ public class Dieta {
     public void setMedico(Medico medico) {
         this.medico = medico;
     }
-    
-    
+
+    public List<DietaAlimento> getAlimentos() {
+        return alimentos;
+    }
+
+    public void setAlimentos(List<DietaAlimento> alimentos) {
+        this.alimentos = alimentos;
+    }
 }

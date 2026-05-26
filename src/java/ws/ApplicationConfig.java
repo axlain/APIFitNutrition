@@ -30,6 +30,8 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(ws.AdministradorWS.class);
         resources.add(ws.AutenticarWS.class);
+        resources.add(ws.DietaAlimentoWS.class);
+        resources.add(ws.DietaWS.class);
         resources.add(ws.DomicilioWS.class);
         resources.add(ws.MedicoWS.class);
         resources.add(ws.PacienteWS.class);
