@@ -3,15 +3,23 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/src/java/modelo/mybatis/mapper/ConsultaMapper.xml</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/src/java/modelo/mybatis/mybatis-config.xml</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/src/java/dominio/ConsultaImp.java</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/src/java/ws/ConsultaWS.java</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/src/java/modelo/mybatis/mapper/DietaMapper.xml</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/nbproject/build-impl.xml</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/nbproject/genfiles.properties</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/nbproject/project.properties</file>
-            <file>file:/D:/stivm/Documentos/!Universidad/8vo%20Semestre/admin%20de%20proyectos/Proyecto/APIFitNutrition/src/java/pojo/Consulta.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/utilidades/GeneradorNumeroPersonal.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/dominio/AdministradorImp.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/modelo/mybatis/MyBatisUtil.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/modelo/mybatis/mybatis-config.xml</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/pojo/Dieta.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/dominio/DietaAlimentoImp.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/dominio/PacienteImp.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/modelo/mybatis/mapper/DietaAlimentoMapper.xml</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/ws/DietaAlimentoWS.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/dto/Respuesta.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/ws/AdministradorWS.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/pojo/DietaAlimento.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/ws/AutenticarWS.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/ws/DietaWS.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/ws/MedicoWS.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/modelo/mybatis/mapper/DietaMapper.xml</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/dominio/DietaImp.java</file>
         </group>
     </open-files>
 </project-private>

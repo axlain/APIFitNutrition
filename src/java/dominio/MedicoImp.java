@@ -108,30 +108,48 @@ public class MedicoImp {
 
         if (conexionBD != null) {
             try {
-                // Editar solo los datos del usuario asociado
+
+                // Obtener idUsuario asociado al médico
+                Integer idUsuario = conexionBD.selectOne(
+                        "medico.obtener-id-usuario",
+                        medico.getIdMedico()
+                );
+
+                medico.setIdUsuario(idUsuario);
+                medico.getUsuario().setIdUsuario(idUsuario);
+
+                // Editar usuario
                 conexionBD.update("usuario.editar", medico.getUsuario());
 
-                // Editar médico, sin modificar numeroPersonal, cedulaProfesional ni contrasena
+                // Editar médico
                 conexionBD.update("medico.editar", medico);
 
                 conexionBD.commit();
+
                 respuesta.setError(false);
                 respuesta.setMensaje("Médico editado correctamente.");
 
             } catch (Exception e) {
+
                 conexionBD.rollback();
+
                 respuesta.setError(true);
                 respuesta.setMensaje("Error al editar médico: " + e.getMessage());
+
             } finally {
+
                 conexionBD.close();
             }
+
         } else {
+
             respuesta.setError(true);
             respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
         }
 
         return respuesta;
     }
+    
     public static List<Medico> buscar(String filtro) {
 
         List<Medico> medicos = null;

@@ -11,40 +11,46 @@ public class GeneradorNumeroPersonal {
             String apellidoMaterno
     ) {
 
-        String prefijo = "FN";
-
         // Abreviatura del rol
-        String rolAbreviado = "";
+        String rolAbreviado;
+
         switch (rol.toUpperCase()) {
             case "MEDICO":
                 rolAbreviado = "MED";
                 break;
+
             case "ADMINISTRADOR":
                 rolAbreviado = "ADM";
                 break;
+
             case "PACIENTE":
                 rolAbreviado = "PAC";
                 break;
+
             default:
                 rolAbreviado = "UNK";
         }
 
-        // Obtiene las primeras 2 letras del nombre
-        String primerasNombre = nombre.substring(0, Math.min(2, nombre.length())).toUpperCase();
+        // Primera letra del nombre
+        String inicialNombre = nombre.substring(0, 1).toUpperCase();
 
-        // Primera letra del apellido paterno
+        // Primera letra apellido paterno
         String inicialPaterno = apellidoPaterno.substring(0, 1).toUpperCase();
 
-        // Primera letra del apellido materno
+        // Primera letra apellido materno
         String inicialMaterno = apellidoMaterno.substring(0, 1).toUpperCase();
 
-        // 3 números aleatorios
+        // 2 números aleatorios
         Random random = new Random();
-        int numeros = 100 + random.nextInt(900); // 100 a 999
+        int numeros = 10 + random.nextInt(90);
 
-        // Concatenar todo
-        return String.format("%s-%s-%s%s%s-%03d", 
-                prefijo, rolAbreviado, primerasNombre, inicialPaterno, inicialMaterno, numeros);
+        return String.format(
+                "%s%s%s%s%02d",
+                rolAbreviado,
+                inicialNombre,
+                inicialPaterno,
+                inicialMaterno,
+                numeros
+        );
     }
-
 }
