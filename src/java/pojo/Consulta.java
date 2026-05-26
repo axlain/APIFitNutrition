@@ -1,10 +1,8 @@
 package pojo;
 
-import java.time.LocalDateTime;
-
 public class Consulta {
     private Integer idConsulta;
-    private LocalDateTime fechaHora;
+    private String fechaHora;
     private Double peso;
     private Double estatura;
     private String talla;
@@ -22,7 +20,7 @@ public class Consulta {
     public Consulta() {
     }
 
-    public Consulta(Integer idConsulta, LocalDateTime fechaHora, Double peso, Double estatura, String talla, Double imc, String observaciones, Integer idPaciente, Paciente paciente, Integer idMedico, Medico medico, Integer idDieta, Dieta dieta) {
+    public Consulta(Integer idConsulta, String fechaHora, Double peso, Double estatura, String talla, Double imc, String observaciones, Integer idPaciente, Paciente paciente, Integer idMedico, Medico medico, Integer idDieta, Dieta dieta) {
         this.idConsulta = idConsulta;
         this.fechaHora = fechaHora;
         this.peso = peso;
@@ -46,11 +44,11 @@ public class Consulta {
         this.idConsulta = idConsulta;
     }
 
-    public LocalDateTime getFechaHora() {
+    public String getFechaHora() {
         return fechaHora;
     }
 
-    public void setFechaHora(LocalDateTime fechaHora) {
+    public void setFechaHora(String fechaHora) {
         this.fechaHora = fechaHora;
     }
 
@@ -141,5 +139,4 @@ public class Consulta {
     public void setDieta(Dieta dieta) {
         this.dieta = dieta;
     }
-    
 }
