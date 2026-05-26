@@ -108,24 +108,41 @@ public class AdministradorImp {
 
         if (conexionBD != null) {
             try {
-                // Solo se editan los datos del usuario
+
+                // Obtener idUsuario asociado al administrador
+                Integer idUsuario = conexionBD.selectOne(
+                        "administrador.obtener-id-usuario",
+                        admin.getIdAdministrador()
+                );
+
+                admin.setIdUsuario(idUsuario);
+                admin.getUsuario().setIdUsuario(idUsuario);
+
+                // Editar usuario
                 conexionBD.update("usuario.editar", admin.getUsuario());
 
-                // Administrador no se edita numeroPersonal ni contrasena
+                // Administrador no edita numeroPersonal ni contraseña
                 conexionBD.update("administrador.editar", admin);
 
                 conexionBD.commit();
+
                 respuesta.setError(false);
-                respuesta.setMensaje("Administrador editado correctamente (sin modificar contraseña ni número personal).");
+                respuesta.setMensaje("Administrador editado correctamente.");
 
             } catch (Exception e) {
+
                 conexionBD.rollback();
+
                 respuesta.setError(true);
                 respuesta.setMensaje("Error al editar administrador: " + e.getMessage());
+
             } finally {
+
                 conexionBD.close();
             }
+
         } else {
+
             respuesta.setError(true);
             respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
         }

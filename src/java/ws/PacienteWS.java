@@ -26,6 +26,18 @@ public class PacienteWS {
     public List<Paciente> obtenerTodos() {
         return PacienteImp.obtenerTodos();
     }
+    
+    @Path("obtener-por-id/{idPaciente}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Paciente obtenerPorId(@PathParam("idPaciente") Integer idPaciente) {
+
+        if (idPaciente == null || idPaciente <= 0) {
+            throw new BadRequestException("ID de paciente inválido");
+        }
+
+        return PacienteImp.obtenerPorId(idPaciente);
+    }
 
     @Path("registrar")
     @POST
@@ -33,9 +45,55 @@ public class PacienteWS {
     @Produces(MediaType.APPLICATION_JSON)
     public Respuesta registrar(String json) {
         Gson gson = new Gson();
+        Respuesta respuesta = new Respuesta();
+
         try {
+            if (json == null || json.trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El cuerpo de la petición es obligatorio.");
+                return respuesta;
+            }
+
             Paciente paciente = gson.fromJson(json, Paciente.class);
+
+            if (paciente == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información del paciente es obligatoria.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario() == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información del usuario es obligatoria.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario().getNombre() == null || paciente.getUsuario().getNombre().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre es obligatorio.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario().getApellidoPaterno() == null || paciente.getUsuario().getApellidoPaterno().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El apellido paterno es obligatorio.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario().getCorreo() == null || paciente.getUsuario().getCorreo().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El correo es obligatorio.");
+                return respuesta;
+            }
+
+            if (paciente.getIdMedico() == null || paciente.getIdMedico() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El médico asignado es obligatorio.");
+                return respuesta;
+            }
+
             return PacienteImp.registrar(paciente);
+
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -47,9 +105,61 @@ public class PacienteWS {
     @Produces(MediaType.APPLICATION_JSON)
     public Respuesta editar(String json) {
         Gson gson = new Gson();
+        Respuesta respuesta = new Respuesta();
+
         try {
+            if (json == null || json.trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El cuerpo de la petición es obligatorio.");
+                return respuesta;
+            }
+
             Paciente paciente = gson.fromJson(json, Paciente.class);
+
+            if (paciente == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información del paciente es obligatoria.");
+                return respuesta;
+            }
+
+            if (paciente.getIdPaciente() == null || paciente.getIdPaciente() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El identificador del paciente es obligatorio.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario() == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información del usuario es obligatoria.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario().getNombre() == null || paciente.getUsuario().getNombre().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre es obligatorio.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario().getApellidoPaterno() == null || paciente.getUsuario().getApellidoPaterno().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El apellido paterno es obligatorio.");
+                return respuesta;
+            }
+
+            if (paciente.getUsuario().getCorreo() == null || paciente.getUsuario().getCorreo().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El correo es obligatorio.");
+                return respuesta;
+            }
+
+            if (paciente.getIdMedico() == null || paciente.getIdMedico() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El médico asignado es obligatorio.");
+                return respuesta;
+            }
+
             return PacienteImp.editar(paciente);
+
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -62,6 +172,7 @@ public class PacienteWS {
         if (idPaciente == null || idPaciente <= 0) {
             throw new BadRequestException("ID de paciente inválido");
         }
+
         return PacienteImp.darBaja(idPaciente);
     }
 
@@ -69,10 +180,13 @@ public class PacienteWS {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Paciente> buscar(@QueryParam("filtro") String filtro) {
-        if (filtro == null) filtro = "";
+        if (filtro == null) {
+            filtro = "";
+        }
+
         return PacienteImp.buscar(filtro);
     }
-    
+
     @Path("actualizar-codigo-acceso/{idPaciente}")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
@@ -80,6 +194,7 @@ public class PacienteWS {
         if (idPaciente == null || idPaciente <= 0) {
             throw new BadRequestException("ID de paciente inválido");
         }
+
         return PacienteImp.actualizarCodigoAcceso(idPaciente);
     }
 }

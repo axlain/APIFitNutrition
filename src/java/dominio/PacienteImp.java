@@ -16,7 +16,6 @@ public class PacienteImp {
         SqlSession conexionBD = MyBatisUtil.getSession();
         if (conexionBD != null) {
             try {
-                // Puedes cambiar el id del mapper si prefieres que traiga solo activos
                 pacientes = conexionBD.selectList("paciente.obtener-todos");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -25,6 +24,31 @@ public class PacienteImp {
             }
         }
         return pacientes;
+    }
+    
+    public static Paciente obtenerPorId(Integer idPaciente) {
+
+        Paciente paciente = null;
+
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+
+                paciente = conexionBD.selectOne(
+                        "paciente.obtener-por-id",
+                        idPaciente
+                );
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return paciente;
     }
 
     public static Respuesta registrar(Paciente paciente) {
@@ -138,20 +162,41 @@ public class PacienteImp {
 
         if (conexionBD != null) {
             try {
-                conexionBD.update("paciente.dar-baja", idPaciente);
-                conexionBD.commit();
 
-                respuesta.setError(false);
-                respuesta.setMensaje("Paciente dado de baja correctamente.");
+                int filasAfectadas = conexionBD.update(
+                        "paciente.dar-baja",
+                        idPaciente
+                );
+
+                if (filasAfectadas > 0) {
+
+                    conexionBD.commit();
+
+                    respuesta.setError(false);
+                    respuesta.setMensaje("Paciente dado de baja correctamente.");
+
+                } else {
+
+                    conexionBD.rollback();
+
+                    respuesta.setError(true);
+                    respuesta.setMensaje("No existe un paciente con ese identificador.");
+                }
 
             } catch (Exception e) {
+
                 conexionBD.rollback();
+
                 respuesta.setError(true);
                 respuesta.setMensaje("Error al dar de baja: " + e.getMessage());
+
             } finally {
+
                 conexionBD.close();
             }
+
         } else {
+
             respuesta.setError(true);
             respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
         }
@@ -165,29 +210,53 @@ public class PacienteImp {
 
         if (conexionBD != null) {
             try {
-                // 1. Generar nuevo código de acceso único
+
                 String nuevoCodigo = generarCodigoUnico(conexionBD);
 
-                // 2. Preparar parámetros para el mapper
                 HashMap<String, Object> parametrosUpdate = new HashMap<>();
                 parametrosUpdate.put("idPaciente", idPaciente);
                 parametrosUpdate.put("nuevoCodigo", nuevoCodigo);
 
-                // 3. Ejecutar actualización
-                conexionBD.update("paciente.actualizar-codigo-acceso", parametrosUpdate);
-                conexionBD.commit();
+                int filasAfectadas = conexionBD.update(
+                        "paciente.actualizar-codigo-acceso",
+                        parametrosUpdate
+                );
 
-                respuesta.setError(false);
-                respuesta.setMensaje("Código de acceso actualizado correctamente: " + nuevoCodigo);
+                if (filasAfectadas > 0) {
+
+                    conexionBD.commit();
+
+                    respuesta.setError(false);
+                    respuesta.setMensaje(
+                            "Código de acceso actualizado correctamente: "
+                            + nuevoCodigo
+                    );
+
+                } else {
+
+                    conexionBD.rollback();
+
+                    respuesta.setError(true);
+                    respuesta.setMensaje("No existe un paciente con ese identificador.");
+                }
 
             } catch (Exception e) {
+
                 conexionBD.rollback();
+
                 respuesta.setError(true);
-                respuesta.setMensaje("Error al actualizar el código de acceso: " + e.getMessage());
+                respuesta.setMensaje(
+                        "Error al actualizar el código de acceso: "
+                        + e.getMessage()
+                );
+
             } finally {
+
                 conexionBD.close();
             }
+
         } else {
+
             respuesta.setError(true);
             respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
         }

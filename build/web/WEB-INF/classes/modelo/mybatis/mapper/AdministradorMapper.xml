@@ -4,9 +4,7 @@
 
 <mapper namespace="administrador">
 
-    <!-- ========================================= -->
     <!-- OBTENER TODOS LOS ADMINISTRADORES -->
-    <!-- ========================================= -->
     <select id="obtener-todos" resultType="pojo.Administrador">
         SELECT
             a.id_administrador AS idAdministrador,
@@ -40,9 +38,7 @@
         ORDER BY u.nombre ASC;
     </select>
 
-    <!-- ========================================= -->
     <!-- REGISTRAR ADMINISTRADOR -->
-    <!-- ========================================= -->
     <insert id="registrar" parameterType="pojo.Administrador">
         INSERT INTO administrador (
             numero_personal,
@@ -56,9 +52,7 @@
         );
     </insert>
 
-    <!-- ========================================= -->
     <!-- EDITAR ADMINISTRADOR -->
-    <!-- ========================================= -->
     <update id="editar" parameterType="pojo.Administrador">
         -- No se editan numeroPersonal ni contrasena por seguridad
         UPDATE administrador
@@ -66,27 +60,21 @@
         WHERE id_administrador = #{idAdministrador};
     </update>
 
-    <!-- ========================================= -->
     <!-- VERIFICAR NÚMERO PERSONAL -->
-    <!-- ========================================= -->
     <select id="verificar-numero-personal" parameterType="string" resultType="int">
         SELECT COUNT(*)
         FROM administrador
         WHERE numero_personal = #{numeroPersonal};
     </select>
 
-    <!-- ========================================= -->
     <!-- OBTENER ID POR NÚMERO PERSONAL -->
-    <!-- ========================================= -->
     <select id="obtener-id-por-numero-personal" parameterType="string" resultType="int">
         SELECT id_administrador
         FROM administrador
         WHERE numero_personal = #{numeroPersonal};
     </select>
 
-    <!-- ========================================= -->
     <!-- OBTENER ADMINISTRADOR POR ID -->
-    <!-- ========================================= -->
     <select id="obtener-por-id" parameterType="int" resultType="pojo.Administrador">
         SELECT
             a.id_administrador AS idAdministrador,
@@ -122,9 +110,7 @@
         WHERE a.id_administrador = #{idAdministrador};
     </select>
 
-    <!-- ========================================= -->
     <!-- BUSCAR ADMINISTRADOR -->
-    <!-- ========================================= -->
     <select id="buscar" parameterType="string" resultType="pojo.Administrador">
         SELECT
             a.id_administrador AS idAdministrador,
@@ -153,10 +139,8 @@
             OR u.apellido_materno LIKE CONCAT('%', #{filtro}, '%')
             OR a.numero_personal LIKE CONCAT('%', #{filtro}, '%');
     </select>
-
-    <!-- ========================================= -->
+    
     <!-- BAJA LÓGICA DEL ADMINISTRADOR -->
-    <!-- ========================================= -->
     <update id="dar-baja" parameterType="int">
         UPDATE usuario
         SET id_estatus = 2
@@ -167,16 +151,23 @@
         );
     </update>
     
-     <select id="verificar-contrasena" parameterType="map" resultType="int">
+    <select id="verificar-contrasena" parameterType="map" resultType="int">
         SELECT COUNT(*)
-        FROM medico
-        WHERE id_medico = #{idMedico} AND contrasena = #{contrasenaActual}
+        FROM administrador
+        WHERE id_administrador = #{idAdministrador} AND contrasena = #{contrasenaActual}
+    </select>
+    
+    <!-- Obtner el id del usuario conforme el id del administrador -->
+    <select id="obtener-id-usuario" parameterType="int" resultType="int">
+        SELECT id_usuario
+        FROM administrador
+        WHERE id_administrador = #{idAdministrador}
     </select>
 
     <!-- Cambiar contraseña -->
     <update id="cambiar-contrasena" parameterType="map">
-        UPDATE medico
+        UPDATE administrador
         SET contrasena = #{nuevaContrasena}
-        WHERE id_medico = #{idMedico}
+        WHERE id_administrador = #{idAdministrador}
     </update>
 </mapper>

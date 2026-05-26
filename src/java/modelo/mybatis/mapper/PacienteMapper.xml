@@ -4,9 +4,7 @@
 
 <mapper namespace="paciente">
 
-    <!-- ========================================= -->
     <!-- OBTENER TODOS LOS PACIENTES -->
-    <!-- ========================================= -->
     <select id="obtener-todos" resultType="pojo.Paciente">
         SELECT
             p.id_paciente AS idPaciente,
@@ -64,11 +62,8 @@
     </select>
 
 
-    <!-- ========================================= -->
     <!-- ALTA: REGISTRAR PACIENTE -->
     <!-- ========================================= -->
-    <!-- Nota: Se asume que el registro de 'usuario' y 'domicilio' 
-         se hace previamente en sus respectivos mappers. -->
     <insert id="registrar" parameterType="pojo.Paciente" useGeneratedKeys="true" keyProperty="idPaciente" keyColumn="id_paciente">
         INSERT INTO paciente (
             codigo_acceso,
@@ -82,10 +77,7 @@
         );
     </insert>
 
-
-    <!-- ========================================= -->
     <!-- EDICIÓN: EDITAR DATOS EXCLUSIVOS DEL PACIENTE -->
-    <!-- ========================================= -->
     <update id="editar" parameterType="pojo.Paciente">
         UPDATE paciente
         SET
@@ -94,9 +86,7 @@
     </update>
 
 
-    <!-- ========================================= -->
     <!-- BAJA LÓGICA (ACTUALIZAR ESTATUS A INACTIVO = 2) -->
-    <!-- ========================================= -->
     <update id="dar-baja" parameterType="int">
         UPDATE usuario
         SET id_estatus = 2
@@ -107,10 +97,7 @@
         );
     </update>
 
-
-    <!-- ========================================= -->
     <!-- BÚSQUEDA DE PACIENTES POR FILTRO -->
-    <!-- ========================================= -->
     <select id="buscar" parameterType="string" resultType="pojo.Paciente">
         SELECT
             p.id_paciente AS idPaciente,
@@ -148,9 +135,7 @@
     </select>
 
 
-    <!-- ========================================= -->
     <!-- OBTENER PACIENTE POR ID -->
-    <!-- ========================================= -->
     <select id="obtener-por-id" parameterType="int" resultType="pojo.Paciente">
         SELECT
             p.id_paciente AS idPaciente,
@@ -197,10 +182,7 @@
         WHERE p.id_paciente = #{idPaciente};
     </select>
 
-
-    <!-- ========================================= -->
     <!-- VERIFICAR CÓDIGO DE ACCESO ÚNICO -->
-    <!-- ========================================= -->
     <select id="verificar-codigo-acceso" parameterType="string" resultType="int">
         SELECT COUNT(*)
         FROM paciente
