@@ -8,61 +8,68 @@ import utilidades.Constantes;
 
 public class UsuarioImp {
 
-    public static Respuesta guardarFoto(int idUsuario, byte[] foto) {
+    public static Respuesta subirFoto(int idUsuario, byte[] foto){
         Respuesta respuesta = new Respuesta();
         respuesta.setError(true);
-
-        try (SqlSession conexionBD = MyBatisUtil.getSession()) {
-
-            // Verificar si el usuario existe
-            if (!existeUsuario(conexionBD, idUsuario)) {
-                respuesta.setMensaje("El usuario no existe");
-                return respuesta;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+        
+        if(conexionBD != null){
+            try{
+                Usuario usuario = new Usuario();
+                usuario.setIdUsuario(idUsuario);
+                usuario.setFotografia(foto);
+                
+                int filasAfectadas = conexionBD.update("usuario.guardar-foto", usuario);
+                conexionBD.commit();
+                
+                if(filasAfectadas > 0){
+                    respuesta.setError(false);
+                    respuesta.setMensaje("La fotografía del usuario(a) ha sido guardada exitosamente");
+                } else {
+                    respuesta.setMensaje("Lo sentimos, la fotografía no se logró guardar");
+                }
+            } catch (Exception e){
+               respuesta.setMensaje(e.getMessage());
+            } finally {
+                // Siempre cerramos la conexión en el bloque finally
+                conexionBD.close();
             }
-
-            Usuario usuario = new Usuario();
-            usuario.setIdUsuario(idUsuario);
-            usuario.setFotografia(foto);
-
-            int filasAfectadas = conexionBD.update("usuario.guardar-foto", usuario);
-            conexionBD.commit();
-
-            if (filasAfectadas > 0) {
-                respuesta.setError(false);
-                respuesta.setMensaje("La fotografía del usuario ha sido guardada exitosamente");
-            } else {
-                respuesta.setMensaje("No se logró guardar la fotografía");
-            }
-
-        } catch (Exception e) {
-            respuesta.setMensaje("Error al guardar la foto: " + e.getMessage());
-        }
-
-        return respuesta;
+       } else {
+           respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
+       }
+       return respuesta;
     }
 
-    public static Usuario obtenerFoto(int idUsuario) {
-        Usuario usuario = null;
+    public static Usuario obtenerFoto(int idUsuario){
+       Usuario usuario = null;
+       SqlSession conexionBD = MyBatisUtil.getSession();
 
-        try (SqlSession conexionBD = MyBatisUtil.getSession()) {
+       if(conexionBD != null){
+           try{
+               // 1. Usamos tu método auxiliar correctamente
+               if (!existeUsuario(conexionBD, idUsuario)) {
+                   return null; 
+               }
 
-            if (!existeUsuario(conexionBD, idUsuario)) {
-                return null;
-            }
+               // 2. Corregimos "colaborador" por "usuario"
+               usuario = conexionBD.selectOne("usuario.obtener-foto", idUsuario);
 
-            usuario = conexionBD.selectOne("usuario.obtener-foto", idUsuario);
+               // 3. Verificamos las propiedades del usuario
+               if(usuario != null && usuario.getFotoBase64() != null){
+                   String fotoLimpia = usuario.getFotoBase64().replaceAll("\\s+", "");
+                   usuario.setFotoBase64(fotoLimpia);
+               }
 
-            if (usuario != null && usuario.getFotoBase64() != null) {
-                String fotoLimpia = usuario.getFotoBase64().replaceAll("\\s+", "");
-                usuario.setFotoBase64(fotoLimpia);
-            }
+           } catch (Exception e){
+               e.printStackTrace();
+           } finally {
+               // Siempre cerramos la conexión
+               conexionBD.close();
+           }
+      } 
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return usuario;
-    }
+      return usuario;
+   }
 
     // MÉTODO AUXILIAR 
     private static boolean existeUsuario(SqlSession conexionBD, int idUsuario) {
