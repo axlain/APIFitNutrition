@@ -6,24 +6,24 @@
 
     <select id="obtener-todas" resultType="pojo.Dieta">
         SELECT
-            id_dieta AS idDieta,
-            nombre,
-            total_calorias AS totalCalorias,
-            observaciones,
-            asignada,
-            id_medico AS idMedico
+        id_dieta AS idDieta,
+        nombre,
+        total_calorias AS totalCalorias,
+        observaciones,
+        asignada,
+        id_medico AS idMedico
         FROM dieta
         ORDER BY nombre ASC;
     </select>
 
     <select id="buscar" parameterType="string" resultType="pojo.Dieta">
         SELECT
-            id_dieta AS idDieta,
-            nombre,
-            total_calorias AS totalCalorias,
-            observaciones,
-            asignada,
-            id_medico AS idMedico
+        id_dieta AS idDieta,
+        nombre,
+        total_calorias AS totalCalorias,
+        observaciones,
+        asignada,
+        id_medico AS idMedico
         FROM dieta
         WHERE nombre LIKE CONCAT('%', #{filtro}, '%')
         ORDER BY nombre ASC;
@@ -31,12 +31,12 @@
 
     <select id="obtener-por-id" parameterType="int" resultType="pojo.Dieta">
         SELECT
-            id_dieta AS idDieta,
-            nombre,
-            total_calorias AS totalCalorias,
-            observaciones,
-            asignada,
-            id_medico AS idMedico
+        id_dieta AS idDieta,
+        nombre,
+        total_calorias AS totalCalorias,
+        observaciones,
+        asignada,
+        id_medico AS idMedico
         FROM dieta
         WHERE id_dieta = #{idDieta};
     </select>
@@ -46,26 +46,26 @@
             keyProperty="idDieta"
             keyColumn="id_dieta">
         INSERT INTO dieta (
-            nombre,
-            total_calorias,
-            observaciones,
-            asignada,
-            id_medico
+        nombre,
+        total_calorias,
+        observaciones,
+        asignada,
+        id_medico
         )
         VALUES (
-            #{nombre},
-            0,
-            #{observaciones},
-            0,
-            #{idMedico}
+        #{nombre},
+        0,
+        #{observaciones},
+        0,
+        #{idMedico}
         );
     </insert>
 
     <update id="editar" parameterType="pojo.Dieta">
         UPDATE dieta
         SET
-            nombre = #{nombre},
-            observaciones = #{observaciones}
+        nombre = #{nombre},
+        observaciones = #{observaciones}
         WHERE id_dieta = #{idDieta};
     </update>
 
@@ -74,5 +74,9 @@
         FROM consulta
         WHERE id_dieta = #{idDieta};
     </select>
+    
+    <update id="marcar-asignada" parameterType="int">
+        UPDATE dieta SET asignada = 1 WHERE id_dieta = #{idDieta}
+    </update>
 
 </mapper>

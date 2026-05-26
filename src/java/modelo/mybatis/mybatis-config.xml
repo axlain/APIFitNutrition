@@ -32,6 +32,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource = "modelo/mybatis/mapper/PacienteMapper.xml"/>
         <mapper resource = "modelo/mybatis/mapper/DietaMapper.xml"/>
         <mapper resource="modelo/mybatis/mapper/DietaAlimentoMapper.xml"/>
+        <mapper resource="modelo/mybatis/mapper/ConsultaMapper.xml"/>
     </mappers>
 
 </configuration>
