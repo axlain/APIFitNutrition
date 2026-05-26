@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="alimento">
+
+    <resultMap id="AlimentoResultMap" type="pojo.Alimento">
+        <id property="idAlimento" column="id_alimento"/>
+        <result property="nombre" column="nombre"/>
+        <result property="porcion" column="porcion"/>
+        <result property="caloriasPorPorcion" column="calorias_por_porcion"/>
+        <result property="idUnidadPorcion" column="id_unidad_porcion"/>
+
+        <association property="unidadPorcion" javaType="pojo.UnidadPorcion">
+            <id property="idUnidadPorcion" column="up_id_unidad_porcion"/>
+            <result property="nombre" column="up_nombre"/>
+        </association>
+    </resultMap>
+
+    <select id="obtener-activos" resultMap="AlimentoResultMap">
+        SELECT
+            a.id_alimento,
+            a.nombre,
+            a.porcion,
+            a.calorias_por_porcion,
+            a.id_unidad_porcion,
+            up.id_unidad_porcion AS up_id_unidad_porcion,
+            up.nombre AS up_nombre
+        FROM alimento a
+        INNER JOIN unidad_porcion up
+            ON a.id_unidad_porcion = up.id_unidad_porcion
+        ORDER BY a.nombre ASC;
+    </select>
+
+    <select id="buscar" parameterType="string" resultMap="AlimentoResultMap">
+        SELECT
+            a.id_alimento,
+            a.nombre,
+            a.porcion,
+            a.calorias_por_porcion,
+            a.id_unidad_porcion,
+            up.id_unidad_porcion AS up_id_unidad_porcion,
+            up.nombre AS up_nombre
+        FROM alimento a
+        INNER JOIN unidad_porcion up
+            ON a.id_unidad_porcion = up.id_unidad_porcion
+        WHERE a.nombre LIKE CONCAT('%', #{filtro}, '%')
+           OR up.nombre LIKE CONCAT('%', #{filtro}, '%')
+        ORDER BY a.nombre ASC;
+    </select>
+
+    <select id="obtener-por-id" parameterType="int" resultMap="AlimentoResultMap">
+        SELECT
+            a.id_alimento,
+            a.nombre,
+            a.porcion,
+            a.calorias_por_porcion,
+            a.id_unidad_porcion,
+            up.id_unidad_porcion AS up_id_unidad_porcion,
+            up.nombre AS up_nombre
+        FROM alimento a
+        INNER JOIN unidad_porcion up
+            ON a.id_unidad_porcion = up.id_unidad_porcion
+        WHERE a.id_alimento = #{idAlimento};
+    </select>
+
+    <select id="verificar-en-dieta" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM dieta_alimento
+        WHERE id_alimento = #{idAlimento};
+    </select>
+
+    <insert id="registrar"
+            parameterType="pojo.Alimento"
+            useGeneratedKeys="true"
+            keyProperty="idAlimento"
+            keyColumn="id_alimento">
+        INSERT INTO alimento (
+            nombre,
+            porcion,
+            calorias_por_porcion,
+            id_unidad_porcion
+        ) VALUES (
+            #{nombre},
+            #{porcion},
+            #{caloriasPorPorcion},
+            #{idUnidadPorcion}
+        );
+    </insert>
+
+    <update id="editar" parameterType="pojo.Alimento">
+        UPDATE alimento
+        SET
+            nombre = #{nombre},
+            porcion = #{porcion},
+            calorias_por_porcion = #{caloriasPorPorcion}
+        WHERE id_alimento = #{idAlimento};
+    </update>
+
+    <delete id="dar-baja" parameterType="int">
+        DELETE FROM alimento
+        WHERE id_alimento = #{idAlimento};
+    </delete>
+
+</mapper>
