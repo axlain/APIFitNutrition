@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cita">
+
+    <insert id="registrar"
+            parameterType="pojo.Cita"
+            useGeneratedKeys="true"
+            keyProperty="idCita"
+            keyColumn="id_cita">
+        INSERT INTO cita (
+            fecha,
+            hora,
+            observaciones,
+            motivo_cancelacion,
+            id_estado_cita,
+            id_paciente,
+            id_medico
+        )
+        VALUES (
+            #{fecha},
+            #{hora},
+            #{observaciones},
+            #{motivoCancelacion},
+            #{idEstadoCita},
+            #{idPaciente},
+            #{idMedico}
+        );
+    </insert>
+
+    <update id="actualizar-estatus" parameterType="map">
+        UPDATE cita
+        SET
+            id_estado_cita = #{idEstadoCita},
+            motivo_cancelacion = #{motivo}
+        WHERE id_cita = #{idCita};
+    </update>
+
+    <update id="reagendar" parameterType="pojo.Cita">
+        UPDATE cita
+        SET
+            fecha = #{fecha},
+            hora = #{hora},
+            observaciones = #{observaciones},
+            id_estado_cita = #{idEstadoCita}
+        WHERE id_cita = #{idCita};
+    </update>
+
+    <select id="verificar-cita-paciente-dia" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM cita
+        WHERE id_paciente = #{idPaciente}
+          AND fecha = #{fecha}
+          AND id_estado_cita IN (2, 4)
+          <if test="idCita != null">
+              AND id_cita != #{idCita}
+          </if>;
+    </select>
+
+    <select id="verificar-disponibilidad-medico" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM cita
+        WHERE id_medico = #{idMedico}
+          AND fecha = #{fecha}
+          AND hora = #{hora}
+          AND id_estado_cita IN (2, 4)
+          <if test="idCita != null">
+              AND id_cita != #{idCita}
+          </if>;
+    </select>
+
+    <select id="obtener-por-medico" parameterType="map" resultType="pojo.Cita">
+        SELECT
+            c.id_cita AS idCita,
+            c.fecha AS fecha,
+            c.hora AS hora,
+            c.observaciones AS observaciones,
+            c.motivo_cancelacion AS motivoCancelacion,
+            c.id_estado_cita AS idEstadoCita,
+            c.id_paciente AS idPaciente,
+            c.id_medico AS idMedico,
+
+            ec.id_estado_cita AS "estadoCita.idEstadoCita",
+            ec.nombre AS "estadoCita.nombre",
+
+            p.id_paciente AS "paciente.idPaciente",
+            p.codigo_acceso AS "paciente.codigoAcceso",
+            p.id_usuario AS "paciente.idUsuario",
+            p.id_medico AS "paciente.idMedico",
+
+            up.id_usuario AS "paciente.usuario.idUsuario",
+            up.nombre AS "paciente.usuario.nombre",
+            up.apellido_paterno AS "paciente.usuario.apellidoPaterno",
+            up.apellido_materno AS "paciente.usuario.apellidoMaterno",
+            up.correo AS "paciente.usuario.correo",
+            up.telefono AS "paciente.usuario.telefono",
+
+            m.id_medico AS "medico.idMedico",
+            m.numero_personal AS "medico.numeroPersonal",
+            m.cedula_profesional AS "medico.cedulaProfesional",
+            m.id_usuario AS "medico.idUsuario",
+
+            um.id_usuario AS "medico.usuario.idUsuario",
+            um.nombre AS "medico.usuario.nombre",
+            um.apellido_paterno AS "medico.usuario.apellidoPaterno",
+            um.apellido_materno AS "medico.usuario.apellidoMaterno"
+        FROM cita c
+        INNER JOIN estado_cita ec
+            ON c.id_estado_cita = ec.id_estado_cita
+        INNER JOIN paciente p
+            ON c.id_paciente = p.id_paciente
+        INNER JOIN usuario up
+            ON p.id_usuario = up.id_usuario
+        INNER JOIN medico m
+            ON c.id_medico = m.id_medico
+        INNER JOIN usuario um
+            ON m.id_usuario = um.id_usuario
+        WHERE c.id_medico = #{idMedico}
+          AND c.fecha = #{fecha}
+        ORDER BY c.hora ASC;
+    </select>
+
+    <select id="obtener-vigentes-paciente" parameterType="int" resultType="pojo.Cita">
+        SELECT
+            c.id_cita AS idCita,
+            c.fecha AS fecha,
+            c.hora AS hora,
+            c.observaciones AS observaciones,
+            c.motivo_cancelacion AS motivoCancelacion,
+            c.id_estado_cita AS idEstadoCita,
+            c.id_paciente AS idPaciente,
+            c.id_medico AS idMedico,
+
+            ec.id_estado_cita AS "estadoCita.idEstadoCita",
+            ec.nombre AS "estadoCita.nombre",
+
+            m.id_medico AS "medico.idMedico",
+            m.numero_personal AS "medico.numeroPersonal",
+            m.cedula_profesional AS "medico.cedulaProfesional",
+            m.id_usuario AS "medico.idUsuario",
+
+            um.id_usuario AS "medico.usuario.idUsuario",
+            um.nombre AS "medico.usuario.nombre",
+            um.apellido_paterno AS "medico.usuario.apellidoPaterno",
+            um.apellido_materno AS "medico.usuario.apellidoMaterno"
+        FROM cita c
+        INNER JOIN estado_cita ec
+            ON c.id_estado_cita = ec.id_estado_cita
+        INNER JOIN medico m
+            ON c.id_medico = m.id_medico
+        INNER JOIN usuario um
+            ON m.id_usuario = um.id_usuario
+        WHERE c.id_paciente = #{value}
+          AND c.id_estado_cita IN (2, 4)
+          AND TIMESTAMP(c.fecha, c.hora) >= NOW()
+        ORDER BY c.fecha ASC, c.hora ASC;
+    </select>
+
+    <update id="marcar-ausentes-automatico">
+        UPDATE cita
+        SET id_estado_cita = 6
+        WHERE id_estado_cita IN (2, 4)
+          AND TIMESTAMP(fecha, hora) &lt; NOW();
+    </update>
+
+    <select id="verificar-existe" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM cita
+        WHERE id_cita = #{value};
+    </select>
+
+    <select id="obtener-por-id" parameterType="int" resultType="pojo.Cita">
+        SELECT
+            id_cita AS idCita,
+            fecha AS fecha,
+            hora AS hora,
+            observaciones AS observaciones,
+            motivo_cancelacion AS motivoCancelacion,
+            id_estado_cita AS idEstadoCita,
+            id_paciente AS idPaciente,
+            id_medico AS idMedico
+        FROM cita
+        WHERE id_cita = #{value};
+    </select>
+
+    <select id="verificar-paciente-existe" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM paciente
+        WHERE id_paciente = #{value};
+    </select>
+
+    <select id="verificar-medico-existe" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM medico
+        WHERE id_medico = #{value};
+    </select>
+
+</mapper>
