@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usuario">
+
+    <insert id="registrar" parameterType="pojo.Usuario">
+        INSERT INTO usuario (
+            nombre,
+            apellido_paterno,
+            apellido_materno,
+            fecha_nacimiento,
+            genero,
+            correo,
+            telefono,
+            fotografia,
+            id_rol,
+            id_estatus,
+            id_domicilio
+        )
+        VALUES (
+            #{nombre},
+            #{apellidoPaterno},
+            #{apellidoMaterno},
+            #{fechaNacimiento},
+            #{genero},
+            #{correo},
+            #{telefono},
+            #{fotografia},
+            #{idRol},
+            #{idEstatus},
+            #{idDomicilio}
+        );
+    </insert>
+
+    <!-- ========================================= -->
+    <!-- EDITAR USUARIO -->
+    <!-- ========================================= -->
+    <update id="editar" parameterType="pojo.Usuario">
+        UPDATE usuario
+        SET
+            nombre = #{nombre},
+            apellido_paterno = #{apellidoPaterno},
+            apellido_materno = #{apellidoMaterno},
+            fecha_nacimiento = #{fechaNacimiento},
+            genero = #{genero},
+            correo = #{correo},
+            telefono = #{telefono},
+            fotografia = #{fotografia},
+            id_rol = #{idRol},
+            id_estatus = #{idEstatus},
+            id_domicilio = #{idDomicilio}
+        WHERE id_usuario = #{idUsuario};
+    </update>
+
+
+    <!-- ========================================= -->
+    <!-- GUARDAR FOTO -->
+    <!-- ========================================= -->
+    <update id="guardar-foto" parameterType="pojo.Usuario">
+
+        UPDATE usuario
+        SET fotografia = #{fotografia}
+        WHERE id_usuario = #{idUsuario};
+
+    </update>
+
+
+    <!-- ========================================= -->
+    <!-- OBTENER FOTO -->
+    <!-- ========================================= -->
+    <select id="obtener-foto"
+            parameterType="int"
+            resultType="pojo.Usuario">
+
+        SELECT
+            id_usuario AS idUsuario,
+            TO_BASE64(fotografia) AS fotoBase64
+        FROM usuario
+        WHERE id_usuario = #{idUsuario};
+
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- VERIFICAR CORREO -->
+    <!-- ========================================= -->
+    <select id="verificar-correo"
+            parameterType="string"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM usuario
+        WHERE correo = #{correo};
+
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- OBTENER ID POR CORREO -->
+    <!-- ========================================= -->
+    <select id="obtener-id-por-correo"
+            parameterType="string"
+            resultType="int">
+
+        SELECT id_usuario
+        FROM usuario
+        WHERE correo = #{correo};
+
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- VERIFICAR EXISTE -->
+    <!-- ========================================= -->
+    <select id="verificar-existe"
+            parameterType="int"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM usuario
+        WHERE id_usuario = #{idUsuario};
+
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- OBTENER USUARIO POR ID -->
+    <!-- ========================================= -->
+    <select id="obtener-por-id"
+            parameterType="int"
+            resultType="pojo.Usuario">
+
+        SELECT
+            u.id_usuario AS idUsuario,
+            u.nombre AS nombre,
+            u.apellido_paterno AS apellidoPaterno,
+            u.apellido_materno AS apellidoMaterno,
+            u.fecha_nacimiento AS fechaNacimiento,
+            u.genero AS genero,
+            u.domicilio AS domicilio,
+            u.correo AS correo,
+            u.telefono AS telefono,
+            u.fotografia AS fotografia,
+            TO_BASE64(u.fotografia) AS fotoBase64,
+            u.id_rol AS idRol,
+            u.id_estatus AS idEstatus,
+
+            r.id_rol AS "rol.idRol",
+            r.nombre AS "rol.nombre",
+
+            eu.id_estatus AS "estatus.idEstatus",
+            eu.nombre AS "estatus.nombre"
+
+        FROM usuario u
+        INNER JOIN rol r
+            ON u.id_rol = r.id_rol
+        INNER JOIN estatus_usuario eu
+            ON u.id_estatus = eu.id_estatus
+
+        WHERE u.id_usuario = #{idUsuario};
+
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- CAMBIAR ESTATUS -->
+    <!-- ========================================= -->
+    <update id="cambiar-estatus" parameterType="map">
+
+        UPDATE usuario
+        SET id_estatus = #{idEstatus}
+        WHERE id_usuario = #{idUsuario};
+
+    </update>
+
+
+    <!-- ========================================= -->
+    <!-- OBTENER TODOS LOS USUARIOS -->
+    <!-- ========================================= -->
+    <select id="obtener-todos"
+            resultType="pojo.Usuario">
+
+        SELECT
+            u.id_usuario AS idUsuario,
+            u.nombre AS nombre,
+            u.apellido_paterno AS apellidoPaterno,
+            u.apellido_materno AS apellidoMaterno,
+            u.fecha_nacimiento AS fechaNacimiento,
+            u.genero AS genero,
+            u.domicilio AS domicilio,
+            u.correo AS correo,
+            u.telefono AS telefono,
+            TO_BASE64(u.fotografia) AS fotoBase64,
+            u.id_rol AS idRol,
+            u.id_estatus AS idEstatus,
+
+            r.nombre AS "rol.nombre",
+            eu.nombre AS "estatus.nombre"
+
+        FROM usuario u
+        INNER JOIN rol r
+            ON u.id_rol = r.id_rol
+        INNER JOIN estatus_usuario eu
+            ON u.id_estatus = eu.id_estatus
+
+        ORDER BY u.nombre ASC;
+
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- BUSCAR USUARIOS -->
+    <!-- ========================================= -->
+    <select id="buscar"
+            parameterType="string"
+            resultType="pojo.Usuario">
+
+        SELECT
+            u.id_usuario AS idUsuario,
+            u.nombre AS nombre,
+            u.apellido_paterno AS apellidoPaterno,
+            u.apellido_materno AS apellidoMaterno,
+            u.correo AS correo,
+            u.telefono AS telefono,
+
+            r.nombre AS "rol.nombre",
+            eu.nombre AS "estatus.nombre"
+
+        FROM usuario u
+        INNER JOIN rol r
+            ON u.id_rol = r.id_rol
+        INNER JOIN estatus_usuario eu
+            ON u.id_estatus = eu.id_estatus
+
+        WHERE
+            u.nombre LIKE CONCAT('%', #{filtro}, '%')
+            OR u.apellido_paterno LIKE CONCAT('%', #{filtro}, '%')
+            OR u.apellido_materno LIKE CONCAT('%', #{filtro}, '%')
+            OR u.correo LIKE CONCAT('%', #{filtro}, '%');
+
+    </select>
+
+</mapper>

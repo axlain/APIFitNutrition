@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="paciente">
+
+    <!-- ========================================= -->
+    <!-- OBTENER TODOS LOS PACIENTES -->
+    <!-- ========================================= -->
+    <select id="obtener-todos" resultType="pojo.Paciente">
+        SELECT
+            p.id_paciente AS idPaciente,
+            p.codigo_acceso AS codigoAcceso,
+            p.id_usuario AS idUsuario,
+            p.id_medico AS idMedico,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_nacimiento AS "usuario.fechaNacimiento",
+            u.genero AS "usuario.genero",
+            u.correo AS "usuario.correo",
+            u.telefono AS "usuario.telefono",
+            u.fotografia AS "usuario.fotografia",
+            TO_BASE64(u.fotografia) AS "usuario.fotoBase64",
+            u.id_rol AS "usuario.idRol",
+            u.id_estatus AS "usuario.idEstatus",
+            u.id_domicilio AS "usuario.idDomicilio",
+
+            r.id_rol AS "usuario.rol.idRol",
+            r.nombre AS "usuario.rol.nombre",
+
+            eu.id_estatus AS "usuario.estatus.idEstatus",
+            eu.nombre AS "usuario.estatus.nombre",
+
+            d.id_domicilio AS "usuario.domicilio.idDomicilio",
+            d.calle AS "usuario.domicilio.calle",
+            d.numero_exterior AS "usuario.domicilio.numeroExterior",
+            d.colonia AS "usuario.domicilio.colonia",
+            d.municipio AS "usuario.domicilio.municipio",
+            d.estado AS "usuario.domicilio.estado",
+            d.codigo_postal AS "usuario.domicilio.codigoPostal",
+
+            m.id_medico AS "medico.idMedico",
+            mu.nombre AS "medico.usuario.nombre",
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno"
+
+        FROM paciente p
+        INNER JOIN usuario u 
+            ON p.id_usuario = u.id_usuario
+        INNER JOIN rol r 
+            ON u.id_rol = r.id_rol
+        INNER JOIN estatus_usuario eu 
+            ON u.id_estatus = eu.id_estatus
+        LEFT JOIN domicilio d 
+            ON u.id_domicilio = d.id_domicilio
+        INNER JOIN medico m 
+            ON p.id_medico = m.id_medico
+        INNER JOIN usuario mu 
+            ON m.id_usuario = mu.id_usuario
+            
+        ORDER BY u.nombre ASC;
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- ALTA: REGISTRAR PACIENTE -->
+    <!-- ========================================= -->
+    <!-- Nota: Se asume que el registro de 'usuario' y 'domicilio' 
+         se hace previamente en sus respectivos mappers. -->
+    <insert id="registrar" parameterType="pojo.Paciente" useGeneratedKeys="true" keyProperty="idPaciente" keyColumn="id_paciente">
+        INSERT INTO paciente (
+            codigo_acceso,
+            id_usuario,
+            id_medico
+        )
+        VALUES (
+            #{codigoAcceso},
+            #{idUsuario},
+            #{idMedico}
+        );
+    </insert>
+
+
+    <!-- ========================================= -->
+    <!-- EDICIÓN: EDITAR DATOS EXCLUSIVOS DEL PACIENTE -->
+    <!-- ========================================= -->
+    <update id="editar" parameterType="pojo.Paciente">
+        UPDATE paciente
+        SET
+            id_medico = #{idMedico}
+        WHERE id_paciente = #{idPaciente};
+    </update>
+
+
+    <!-- ========================================= -->
+    <!-- BAJA LÓGICA (ACTUALIZAR ESTATUS A INACTIVO = 2) -->
+    <!-- ========================================= -->
+    <update id="dar-baja" parameterType="int">
+        UPDATE usuario
+        SET id_estatus = 2
+        WHERE id_usuario = (
+            SELECT id_usuario
+            FROM paciente
+            WHERE id_paciente = #{idPaciente}
+        );
+    </update>
+
+
+    <!-- ========================================= -->
+    <!-- BÚSQUEDA DE PACIENTES POR FILTRO -->
+    <!-- ========================================= -->
+    <select id="buscar" parameterType="string" resultType="pojo.Paciente">
+        SELECT
+            p.id_paciente AS idPaciente,
+            p.codigo_acceso AS codigoAcceso,
+            p.id_medico AS idMedico,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.correo AS "usuario.correo",
+            u.telefono AS "usuario.telefono",
+
+            eu.nombre AS "usuario.estatus.nombre",
+
+            mu.nombre AS "medico.usuario.nombre",
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno"
+
+        FROM paciente p
+        INNER JOIN usuario u 
+            ON p.id_usuario = u.id_usuario
+        INNER JOIN estatus_usuario eu 
+            ON u.id_estatus = eu.id_estatus
+        INNER JOIN medico m 
+            ON p.id_medico = m.id_medico
+        INNER JOIN usuario mu 
+            ON m.id_usuario = mu.id_usuario
+
+        WHERE
+            u.nombre LIKE CONCAT('%', #{filtro}, '%')
+            OR u.apellido_paterno LIKE CONCAT('%', #{filtro}, '%')
+            OR u.apellido_materno LIKE CONCAT('%', #{filtro}, '%')
+            OR p.codigo_acceso LIKE CONCAT('%', #{filtro}, '%')
+            OR u.correo LIKE CONCAT('%', #{filtro}, '%');
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- OBTENER PACIENTE POR ID -->
+    <!-- ========================================= -->
+    <select id="obtener-por-id" parameterType="int" resultType="pojo.Paciente">
+        SELECT
+            p.id_paciente AS idPaciente,
+            p.codigo_acceso AS codigoAcceso,
+            p.id_usuario AS idUsuario,
+            p.id_medico AS idMedico,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_nacimiento AS "usuario.fechaNacimiento",
+            u.genero AS "usuario.genero",
+            u.correo AS "usuario.correo",
+            u.telefono AS "usuario.telefono",
+            TO_BASE64(u.fotografia) AS "usuario.fotoBase64",
+            
+            d.id_domicilio AS "usuario.domicilio.idDomicilio",
+            d.calle AS "usuario.domicilio.calle",
+            d.numero_exterior AS "usuario.domicilio.numeroExterior",
+            d.colonia AS "usuario.domicilio.colonia",
+            d.municipio AS "usuario.domicilio.municipio",
+            d.estado AS "usuario.domicilio.estado",
+            d.codigo_postal AS "usuario.domicilio.codigoPostal",
+
+            eu.id_estatus AS "usuario.estatus.idEstatus",
+            eu.nombre AS "usuario.estatus.nombre",
+            
+            mu.nombre AS "medico.usuario.nombre",
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno"
+
+        FROM paciente p
+        INNER JOIN usuario u 
+            ON p.id_usuario = u.id_usuario
+        LEFT JOIN domicilio d 
+            ON u.id_domicilio = d.id_domicilio
+        INNER JOIN estatus_usuario eu 
+            ON u.id_estatus = eu.id_estatus
+        INNER JOIN medico m 
+            ON p.id_medico = m.id_medico
+        INNER JOIN usuario mu 
+            ON m.id_usuario = mu.id_usuario
+
+        WHERE p.id_paciente = #{idPaciente};
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- VERIFICAR CÓDIGO DE ACCESO ÚNICO -->
+    <!-- ========================================= -->
+    <select id="verificar-codigo-acceso" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM paciente
+        WHERE codigo_acceso = #{codigoAcceso};
+    </select>
+    
+    <update id="actualizar-codigo-acceso" parameterType="map">
+        UPDATE paciente
+        SET codigo_acceso = #{nuevoCodigo}
+        WHERE id_paciente = #{idPaciente};
+    </update>
+</mapper>
