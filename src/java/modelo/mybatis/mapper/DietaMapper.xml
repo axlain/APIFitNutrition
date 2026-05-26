@@ -79,4 +79,24 @@
         UPDATE dieta SET asignada = 1 WHERE id_dieta = #{idDieta}
     </update>
 
+    <update id="recalcular-calorias-por-alimento" parameterType="int">
+    UPDATE dieta d
+    SET d.total_calorias = (
+        SELECT IFNULL(SUM(a.calorias_por_porcion * da.cantidad), 0)
+        FROM dieta_alimento da
+        INNER JOIN alimento a
+            ON da.id_alimento = a.id_alimento
+        WHERE da.id_dieta = d.id_dieta
+    )
+    WHERE d.id_dieta IN (
+        SELECT da2.id_dieta
+        FROM dieta_alimento da2
+        WHERE da2.id_alimento = #{idAlimento}
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM consulta c
+        WHERE c.id_dieta = d.id_dieta
+    );
+</update>
 </mapper>
