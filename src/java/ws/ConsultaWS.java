@@ -11,9 +11,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import pojo.Consulta;
 
 @Path("consulta")
@@ -24,46 +22,83 @@ public class ConsultaWS {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Respuesta registrar(String jsonInput) {
-        if (jsonInput == null || jsonInput.isEmpty()) {
-            throw new WebApplicationException(
-                    Response.status(Response.Status.BAD_REQUEST)
-                            .entity("{\"error\": true, \"mensaje\": \"El cuerpo de la solicitud no puede estar vacío.\"}")
-                            .build()
-            );
-        }
+
+        Gson gson = new Gson();
+        Respuesta respuesta = new Respuesta();
 
         try {
-            Gson gson = new Gson();
+
+            if (jsonInput == null || jsonInput.trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El cuerpo de la petición es obligatorio.");
+                return respuesta;
+            }
+
             Consulta consulta = gson.fromJson(jsonInput, Consulta.class);
 
-            if (consulta.getIdPaciente() == null || consulta.getIdMedico() == null
-                    || consulta.getPeso() == null || consulta.getEstatura() == null || consulta.getTalla() == null) {
+            if (consulta == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información de la consulta es obligatoria.");
+                return respuesta;
+            }
 
-                Respuesta resError = new Respuesta();
-                resError.setError(true);
-                resError.setMensaje("Faltan parámetros obligatorios (idPaciente, idMedico, peso, estatura o talla).");
-                return resError;
+            if (consulta.getIdPaciente() == null || consulta.getIdPaciente() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El paciente es obligatorio.");
+                return respuesta;
+            }
+
+            if (consulta.getIdMedico() == null || consulta.getIdMedico() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El médico es obligatorio.");
+                return respuesta;
+            }
+
+            if (consulta.getPeso() == null || consulta.getPeso() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El peso debe ser mayor a 0.");
+                return respuesta;
+            }
+
+            if (consulta.getEstatura() == null || consulta.getEstatura() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La estatura debe ser mayor a 0.");
+                return respuesta;
+            }
+
+            if (consulta.getTalla() == null || consulta.getTalla().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La talla es obligatoria.");
+                return respuesta;
+            }
+
+            if (consulta.getTalla().trim().length() > 20) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La talla no puede exceder 20 caracteres.");
+                return respuesta;
             }
 
             return ConsultaImp.registrarConsulta(consulta);
 
         } catch (Exception e) {
-            Respuesta resFail = new Respuesta();
-            resFail.setError(true);
-            resFail.setMensaje("Error al procesar la solicitud JSON: " + e.getMessage());
-            return resFail;
+
+            throw new BadRequestException(
+                    "JSON inválido para registrar consulta: "
+                    + e.getMessage()
+            );
         }
     }
 
     @GET
     @Path("historial/{idPaciente}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Consulta> obtenerHistorialPaciente(@PathParam("idPaciente") Integer idPaciente) {
+    public List<Consulta> obtenerHistorialPaciente(
+            @PathParam("idPaciente") Integer idPaciente
+    ) {
+
         if (idPaciente == null || idPaciente <= 0) {
-            throw new WebApplicationException(
-                    Response.status(Response.Status.BAD_REQUEST)
-                            .entity("{\"error\": true, \"mensaje\": \"El idPaciente proporcionado no es válido.\"}")
-                            .build()
+            throw new BadRequestException(
+                    "El id del paciente es inválido."
             );
         }
 
@@ -73,21 +108,16 @@ public class ConsultaWS {
     @GET
     @Path("obtener/{idConsulta}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerDetalleConsulta(@PathParam("idConsulta") Integer idConsulta) {
+    public Consulta obtenerDetalleConsulta(
+            @PathParam("idConsulta") Integer idConsulta
+    ) {
+
         if (idConsulta == null || idConsulta <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\": true, \"mensaje\": \"El idConsulta proporcionado no es válido.\"}")
-                    .build();
+            throw new BadRequestException(
+                    "El id de la consulta es inválido."
+            );
         }
 
-        Consulta consulta = ConsultaImp.obtenerDetalleConsulta(idConsulta);
-
-        if (consulta != null) {
-            return Response.status(Response.Status.OK).entity(consulta).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\": true, \"mensaje\": \"La consulta especificada no existe.\"}")
-                    .build();
-        }
+        return ConsultaImp.obtenerDetalleConsulta(idConsulta);
     }
 }

@@ -6,6 +6,7 @@ import dto.Respuesta;
 import java.util.List;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -33,10 +34,22 @@ public class DietaWS {
     @Produces(MediaType.APPLICATION_JSON)
     public Dieta obtenerPorId(@PathParam("idDieta") Integer idDieta) {
         if (idDieta == null || idDieta <= 0) {
-            throw new BadRequestException("El id de la dieta es obligatorio.");
+            throw new BadRequestException("El id de la dieta es inválido.");
         }
 
         return DietaImp.obtenerPorId(idDieta);
+    }
+    
+    @GET
+    @Path("detalle/{idDieta}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Dieta obtenerDetalle(@PathParam("idDieta") Integer idDieta) {
+
+        if (idDieta == null || idDieta <= 0) {
+            throw new BadRequestException("El id de la dieta es inválido.");
+        }
+
+        return DietaImp.obtenerDetalle(idDieta);
     }
 
     @GET
@@ -55,23 +68,51 @@ public class DietaWS {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Respuesta registrar(String jsonDieta) {
+        Respuesta respuesta = new Respuesta();
+
         try {
             if (jsonDieta == null || jsonDieta.trim().isEmpty()) {
-                throw new BadRequestException("El JSON de la dieta es obligatorio.");
+                respuesta.setError(true);
+                respuesta.setMensaje("El cuerpo de la petición es obligatorio.");
+                return respuesta;
             }
 
             Dieta dieta = gson.fromJson(jsonDieta, Dieta.class);
 
             if (dieta == null) {
-                throw new BadRequestException("No se pudo interpretar la información de la dieta.");
+                respuesta.setError(true);
+                respuesta.setMensaje("La información de la dieta es obligatoria.");
+                return respuesta;
+            }
+
+            if (dieta.getNombre() == null || dieta.getNombre().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre de la dieta es obligatorio.");
+                return respuesta;
+            }
+
+            if (dieta.getNombre().trim().length() > 100) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre de la dieta no puede exceder 100 caracteres.");
+                return respuesta;
+            }
+
+            if (dieta.getObservaciones() != null && dieta.getObservaciones().trim().length() > 255) {
+                respuesta.setError(true);
+                respuesta.setMensaje("Las observaciones no pueden exceder 255 caracteres.");
+                return respuesta;
+            }
+
+            if (dieta.getIdMedico() == null || dieta.getIdMedico() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El médico responsable es obligatorio.");
+                return respuesta;
             }
 
             return DietaImp.registrar(dieta);
 
-        } catch (BadRequestException e) {
-            throw e;
         } catch (Exception e) {
-            throw new BadRequestException("JSON inválido para registrar dieta.");
+            throw new BadRequestException("JSON inválido para registrar dieta: " + e.getMessage());
         }
     }
 
@@ -80,23 +121,69 @@ public class DietaWS {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Respuesta editar(String jsonDieta) {
+        Respuesta respuesta = new Respuesta();
+
         try {
             if (jsonDieta == null || jsonDieta.trim().isEmpty()) {
-                throw new BadRequestException("El JSON de la dieta es obligatorio.");
+                respuesta.setError(true);
+                respuesta.setMensaje("El cuerpo de la petición es obligatorio.");
+                return respuesta;
             }
 
             Dieta dieta = gson.fromJson(jsonDieta, Dieta.class);
 
-            if (dieta == null || dieta.getIdDieta() == null || dieta.getIdDieta() <= 0) {
-                throw new BadRequestException("Debe enviar una dieta válida con idDieta.");
+            if (dieta == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información de la dieta es obligatoria.");
+                return respuesta;
+            }
+
+            if (dieta.getIdDieta() == null || dieta.getIdDieta() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El identificador de la dieta es obligatorio.");
+                return respuesta;
+            }
+
+            if (dieta.getNombre() == null || dieta.getNombre().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre de la dieta es obligatorio.");
+                return respuesta;
+            }
+
+            if (dieta.getNombre().trim().length() > 100) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre de la dieta no puede exceder 100 caracteres.");
+                return respuesta;
+            }
+
+            if (dieta.getObservaciones() != null && dieta.getObservaciones().trim().length() > 255) {
+                respuesta.setError(true);
+                respuesta.setMensaje("Las observaciones no pueden exceder 255 caracteres.");
+                return respuesta;
+            }
+
+            if (dieta.getIdMedico() == null || dieta.getIdMedico() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El médico responsable es obligatorio.");
+                return respuesta;
             }
 
             return DietaImp.editar(dieta);
 
-        } catch (BadRequestException e) {
-            throw e;
         } catch (Exception e) {
-            throw new BadRequestException("JSON inválido para editar dieta.");
+            throw new BadRequestException("JSON inválido para editar dieta: " + e.getMessage());
         }
+    }
+    
+    @DELETE
+    @Path("eliminar/{idDieta}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Respuesta eliminar(@PathParam("idDieta") Integer idDieta) {
+
+        if (idDieta == null || idDieta <= 0) {
+            throw new BadRequestException("El id de la dieta es inválido.");
+        }
+
+        return DietaImp.eliminar(idDieta);
     }
 }

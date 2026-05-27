@@ -44,10 +44,55 @@ public class AlimentoWS {
     @Produces(MediaType.APPLICATION_JSON)
     public Respuesta registrar(String json) {
         Gson gson = new Gson();
+        Respuesta respuesta = new Respuesta();
 
         try {
+            if (json == null || json.trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El cuerpo de la petición es obligatorio.");
+                return respuesta;
+            }
+
             Alimento alimento = gson.fromJson(json, Alimento.class);
+
+            if (alimento == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información del alimento es obligatoria.");
+                return respuesta;
+            }
+
+            if (alimento.getNombre() == null || alimento.getNombre().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre del alimento es obligatorio.");
+                return respuesta;
+            }
+
+            if (alimento.getNombre().trim().length() > 100) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre del alimento no puede exceder 100 caracteres.");
+                return respuesta;
+            }
+
+            if (alimento.getPorcion() == null || alimento.getPorcion().doubleValue() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La porción debe ser mayor a 0.");
+                return respuesta;
+            }
+
+            if (alimento.getCaloriasPorPorcion() == null || alimento.getCaloriasPorPorcion().doubleValue() < 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("Las calorías por porción no pueden ser negativas.");
+                return respuesta;
+            }
+
+            if (alimento.getIdUnidadPorcion() == null || alimento.getIdUnidadPorcion() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La unidad de porción es obligatoria.");
+                return respuesta;
+            }
+
             return AlimentoImp.registrar(alimento);
+
         } catch (Exception e) {
             throw new BadRequestException("JSON inválido para registrar alimento: " + e.getMessage());
         }
@@ -59,10 +104,61 @@ public class AlimentoWS {
     @Produces(MediaType.APPLICATION_JSON)
     public Respuesta editar(String json) {
         Gson gson = new Gson();
+        Respuesta respuesta = new Respuesta();
 
         try {
+            if (json == null || json.trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El cuerpo de la petición es obligatorio.");
+                return respuesta;
+            }
+
             Alimento alimento = gson.fromJson(json, Alimento.class);
+
+            if (alimento == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información del alimento es obligatoria.");
+                return respuesta;
+            }
+
+            if (alimento.getIdAlimento() == null || alimento.getIdAlimento() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El identificador del alimento es obligatorio.");
+                return respuesta;
+            }
+
+            if (alimento.getNombre() == null || alimento.getNombre().trim().isEmpty()) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre del alimento es obligatorio.");
+                return respuesta;
+            }
+
+            if (alimento.getNombre().trim().length() > 100) {
+                respuesta.setError(true);
+                respuesta.setMensaje("El nombre del alimento no puede exceder 100 caracteres.");
+                return respuesta;
+            }
+
+            if (alimento.getPorcion() == null || alimento.getPorcion().doubleValue() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La porción debe ser mayor a 0.");
+                return respuesta;
+            }
+
+            if (alimento.getCaloriasPorPorcion() == null || alimento.getCaloriasPorPorcion().doubleValue() < 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("Las calorías por porción no pueden ser negativas.");
+                return respuesta;
+            }
+
+            if (alimento.getIdUnidadPorcion() == null || alimento.getIdUnidadPorcion() <= 0) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La unidad de porción es obligatoria.");
+                return respuesta;
+            }
+
             return AlimentoImp.editar(alimento);
+
         } catch (Exception e) {
             throw new BadRequestException("JSON inválido para editar alimento: " + e.getMessage());
         }

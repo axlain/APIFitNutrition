@@ -13,7 +13,6 @@ public class Dieta {
     private Integer idMedico;
     private Medico medico;
 
-    // LISTA DE ALIMENTOS DE LA DIETA
     private List<DietaAlimento> alimentos;
 
     public Dieta() {

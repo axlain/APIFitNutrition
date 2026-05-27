@@ -6,24 +6,24 @@
 
     <select id="obtener-todas" resultType="pojo.Dieta">
         SELECT
-        id_dieta AS idDieta,
-        nombre,
-        total_calorias AS totalCalorias,
-        observaciones,
-        asignada,
-        id_medico AS idMedico
+            id_dieta AS idDieta,
+            nombre,
+            total_calorias AS totalCalorias,
+            observaciones,
+            asignada,
+            id_medico AS idMedico
         FROM dieta
         ORDER BY nombre ASC;
     </select>
 
     <select id="buscar" parameterType="string" resultType="pojo.Dieta">
         SELECT
-        id_dieta AS idDieta,
-        nombre,
-        total_calorias AS totalCalorias,
-        observaciones,
-        asignada,
-        id_medico AS idMedico
+            id_dieta AS idDieta,
+            nombre,
+            total_calorias AS totalCalorias,
+            observaciones,
+            asignada,
+            id_medico AS idMedico
         FROM dieta
         WHERE nombre LIKE CONCAT('%', #{filtro}, '%')
         ORDER BY nombre ASC;
@@ -31,72 +31,99 @@
 
     <select id="obtener-por-id" parameterType="int" resultType="pojo.Dieta">
         SELECT
-        id_dieta AS idDieta,
-        nombre,
-        total_calorias AS totalCalorias,
-        observaciones,
-        asignada,
-        id_medico AS idMedico
+            id_dieta AS idDieta,
+            nombre,
+            total_calorias AS totalCalorias,
+            observaciones,
+            asignada,
+            id_medico AS idMedico
         FROM dieta
         WHERE id_dieta = #{idDieta};
     </select>
 
-    <insert id="registrar" parameterType="pojo.Dieta"
+    <insert id="registrar" 
+            parameterType="pojo.Dieta"
             useGeneratedKeys="true"
             keyProperty="idDieta"
             keyColumn="id_dieta">
         INSERT INTO dieta (
-        nombre,
-        total_calorias,
-        observaciones,
-        asignada,
-        id_medico
+            nombre,
+            total_calorias,
+            observaciones,
+            asignada,
+            id_medico
         )
         VALUES (
-        #{nombre},
-        0,
-        #{observaciones},
-        0,
-        #{idMedico}
+            #{nombre},
+            0,
+            #{observaciones},
+            0,
+            #{idMedico}
         );
     </insert>
 
     <update id="editar" parameterType="pojo.Dieta">
         UPDATE dieta
         SET
-        nombre = #{nombre},
-        observaciones = #{observaciones}
+            nombre = #{nombre},
+            observaciones = #{observaciones}
         WHERE id_dieta = #{idDieta};
     </update>
+
+    <select id="verificar-existe" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM dieta
+        WHERE id_dieta = #{idDieta};
+    </select>
+
+    <select id="verificar-asignada" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM dieta
+        WHERE id_dieta = #{idDieta}
+        AND asignada = 1;
+    </select>
 
     <select id="verificar-dieta-en-uso" parameterType="int" resultType="int">
         SELECT COUNT(*)
         FROM consulta
         WHERE id_dieta = #{idDieta};
     </select>
-    
+
+    <delete id="eliminar-alimentos" parameterType="int">
+        DELETE FROM dieta_alimento
+        WHERE id_dieta = #{idDieta};
+    </delete>
+
+    <delete id="eliminar" parameterType="int">
+        DELETE FROM dieta
+        WHERE id_dieta = #{idDieta};
+    </delete>
+
     <update id="marcar-asignada" parameterType="int">
-        UPDATE dieta SET asignada = 1 WHERE id_dieta = #{idDieta}
+        UPDATE dieta
+        SET asignada = 1
+        WHERE id_dieta = #{idDieta};
     </update>
 
     <update id="recalcular-calorias-por-alimento" parameterType="int">
-    UPDATE dieta d
-    SET d.total_calorias = (
-        SELECT IFNULL(SUM(a.calorias_por_porcion * da.cantidad), 0)
-        FROM dieta_alimento da
-        INNER JOIN alimento a
-            ON da.id_alimento = a.id_alimento
-        WHERE da.id_dieta = d.id_dieta
-    )
-    WHERE d.id_dieta IN (
-        SELECT da2.id_dieta
-        FROM dieta_alimento da2
-        WHERE da2.id_alimento = #{idAlimento}
-    )
-    AND NOT EXISTS (
-        SELECT 1
-        FROM consulta c
-        WHERE c.id_dieta = d.id_dieta
-    );
-</update>
+        UPDATE dieta d
+        SET d.total_calorias = (
+            SELECT IFNULL(SUM(a.calorias_por_porcion * da.cantidad), 0)
+            FROM dieta_alimento da
+            INNER JOIN alimento a
+                ON da.id_alimento = a.id_alimento
+            WHERE da.id_dieta = d.id_dieta
+        )
+        WHERE d.id_dieta IN (
+            SELECT da2.id_dieta
+            FROM dieta_alimento da2
+            WHERE da2.id_alimento = #{idAlimento}
+        )
+        AND NOT EXISTS (
+            SELECT 1
+            FROM consulta c
+            WHERE c.id_dieta = d.id_dieta
+        );
+    </update>
+
 </mapper>
