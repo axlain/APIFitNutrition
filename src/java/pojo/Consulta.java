@@ -16,11 +16,12 @@ public class Consulta {
     private Medico medico;
     private Integer idDieta;
     private Dieta dieta; 
-
+    private Integer idCita; 
+           
     public Consulta() {
     }
 
-    public Consulta(Integer idConsulta, String fechaHora, Double peso, Double estatura, String talla, Double imc, String observaciones, Integer idPaciente, Paciente paciente, Integer idMedico, Medico medico, Integer idDieta, Dieta dieta) {
+    public Consulta(Integer idConsulta, String fechaHora, Double peso, Double estatura, String talla, Double imc, String observaciones, Integer idPaciente, Paciente paciente, Integer idMedico, Medico medico, Integer idDieta, Dieta dieta, Integer idCita) {
         this.idConsulta = idConsulta;
         this.fechaHora = fechaHora;
         this.peso = peso;
@@ -34,6 +35,7 @@ public class Consulta {
         this.medico = medico;
         this.idDieta = idDieta;
         this.dieta = dieta;
+        this.idCita = idCita;
     }
 
     public Integer getIdConsulta() {
@@ -139,4 +141,14 @@ public class Consulta {
     public void setDieta(Dieta dieta) {
         this.dieta = dieta;
     }
+
+    public Integer getIdCita() {
+        return idCita;
+    }
+
+    public void setIdCita(Integer idCita) {
+        this.idCita = idCita;
+    }
+
+    
 }
