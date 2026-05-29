@@ -20,8 +20,6 @@
             u.genero AS "usuario.genero",
             u.correo AS "usuario.correo",
             u.telefono AS "usuario.telefono",
-            u.fotografia AS "usuario.fotografia",
-            TO_BASE64(u.fotografia) AS "usuario.fotoBase64",
             u.id_rol AS "usuario.idRol",
             u.id_estatus AS "usuario.idEstatus",
             u.id_domicilio AS "usuario.idDomicilio",
