@@ -196,4 +196,103 @@
         WHERE id_medico = #{value};
     </select>
 
+    <select id="obtener-todas" resultType="pojo.Cita">
+        SELECT
+            c.id_cita AS idCita,
+            c.fecha AS fecha,
+            c.hora AS hora,
+            c.observaciones AS observaciones,
+            c.motivo_cancelacion AS motivoCancelacion,
+            c.id_estado_cita AS idEstadoCita,
+            c.id_paciente AS idPaciente,
+            c.id_medico AS idMedico,
+
+            ec.id_estado_cita AS "estadoCita.idEstadoCita",
+            ec.nombre AS "estadoCita.nombre",
+
+            p.id_paciente AS "paciente.idPaciente",
+            p.codigo_acceso AS "paciente.codigoAcceso",
+            p.id_usuario AS "paciente.idUsuario",
+            p.id_medico AS "paciente.idMedico",
+
+            up.id_usuario AS "paciente.usuario.idUsuario",
+            up.nombre AS "paciente.usuario.nombre",
+            up.apellido_paterno AS "paciente.usuario.apellidoPaterno",
+            up.apellido_materno AS "paciente.usuario.apellidoMaterno",
+            up.correo AS "paciente.usuario.correo",
+            up.telefono AS "paciente.usuario.telefono",
+
+            m.id_medico AS "medico.idMedico",
+            m.numero_personal AS "medico.numeroPersonal",
+            m.cedula_profesional AS "medico.cedulaProfesional",
+            m.id_usuario AS "medico.idUsuario",
+
+            um.id_usuario AS "medico.usuario.idUsuario",
+            um.nombre AS "medico.usuario.nombre",
+            um.apellido_paterno AS "medico.usuario.apellidoPaterno",
+            um.apellido_materno AS "medico.usuario.apellidoMaterno"
+        FROM cita c
+        INNER JOIN estado_cita ec
+            ON c.id_estado_cita = ec.id_estado_cita
+        INNER JOIN paciente p
+            ON c.id_paciente = p.id_paciente
+        INNER JOIN usuario up
+            ON p.id_usuario = up.id_usuario
+        INNER JOIN medico m
+            ON c.id_medico = m.id_medico
+        INNER JOIN usuario um
+            ON m.id_usuario = um.id_usuario
+        ORDER BY c.fecha DESC, c.hora DESC;
+    </select>
+
+    <select id="obtener-por-fecha" parameterType="string" resultType="pojo.Cita">
+        SELECT
+            c.id_cita AS idCita,
+            c.fecha AS fecha,
+            c.hora AS hora,
+            c.observaciones AS observaciones,
+            c.motivo_cancelacion AS motivoCancelacion,
+            c.id_estado_cita AS idEstadoCita,
+            c.id_paciente AS idPaciente,
+            c.id_medico AS idMedico,
+
+            ec.id_estado_cita AS "estadoCita.idEstadoCita",
+            ec.nombre AS "estadoCita.nombre",
+
+            p.id_paciente AS "paciente.idPaciente",
+            p.codigo_acceso AS "paciente.codigoAcceso",
+            p.id_usuario AS "paciente.idUsuario",
+            p.id_medico AS "paciente.idMedico",
+
+            up.id_usuario AS "paciente.usuario.idUsuario",
+            up.nombre AS "paciente.usuario.nombre",
+            up.apellido_paterno AS "paciente.usuario.apellidoPaterno",
+            up.apellido_materno AS "paciente.usuario.apellidoMaterno",
+            up.correo AS "paciente.usuario.correo",
+            up.telefono AS "paciente.usuario.telefono",
+
+            m.id_medico AS "medico.idMedico",
+            m.numero_personal AS "medico.numeroPersonal",
+            m.cedula_profesional AS "medico.cedulaProfesional",
+            m.id_usuario AS "medico.idUsuario",
+
+            um.id_usuario AS "medico.usuario.idUsuario",
+            um.nombre AS "medico.usuario.nombre",
+            um.apellido_paterno AS "medico.usuario.apellidoPaterno",
+            um.apellido_materno AS "medico.usuario.apellidoMaterno"
+        FROM cita c
+        INNER JOIN estado_cita ec
+            ON c.id_estado_cita = ec.id_estado_cita
+        INNER JOIN paciente p
+            ON c.id_paciente = p.id_paciente
+        INNER JOIN usuario up
+            ON p.id_usuario = up.id_usuario
+        INNER JOIN medico m
+            ON c.id_medico = m.id_medico
+        INNER JOIN usuario um
+            ON m.id_usuario = um.id_usuario
+        WHERE c.fecha = #{value}
+        ORDER BY c.hora ASC;
+    </select>
+
 </mapper>

@@ -447,6 +447,40 @@ public class CitaImp {
         return parseHora(hora).format(FORMATO_HORA);
     }
 
+    public static List<Cita> obtenerTodas() {
+        List<Cita> citas = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                citas = conexionBD.selectList("cita.obtener-todas");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return citas;
+    }
+
+    public static List<Cita> obtenerPorFecha(String fecha) {
+        List<Cita> citas = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                citas = conexionBD.selectList("cita.obtener-por-fecha", fecha);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return citas;
+    }
+
     private static boolean esEstadoPermitido(int estado) {
         return estado == ESTADO_CANCELADA
                 || estado == ESTADO_REAGENDADA

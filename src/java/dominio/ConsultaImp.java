@@ -9,6 +9,47 @@ import pojo.Consulta;
 
 public class ConsultaImp {
 
+    public static List<Consulta> obtenerTodas() {
+        List<Consulta> consultas = new ArrayList<>();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+        if (conexionBD != null) {
+            try {
+                consultas = conexionBD.selectList("consulta.obtener-todas");
+            } finally {
+                conexionBD.close();
+            }
+        }
+        return consultas;
+    }
+
+    public static Respuesta editar(Consulta consulta) {
+        Respuesta respuesta = new Respuesta();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+        if (conexionBD != null) {
+            try {
+                if (consulta == null || consulta.getIdConsulta() == null || consulta.getIdConsulta() <= 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("No se recibió la información de la consulta a editar.");
+                    return respuesta;
+                }
+                conexionBD.update("consulta.editar", consulta);
+                conexionBD.commit();
+                respuesta.setError(false);
+                respuesta.setMensaje("Consulta actualizada correctamente.");
+            } catch (Exception e) {
+                conexionBD.rollback();
+                respuesta.setError(true);
+                respuesta.setMensaje("Error al editar la consulta: " + e.getMessage());
+            } finally {
+                conexionBD.close();
+            }
+        } else {
+            respuesta.setError(true);
+            respuesta.setMensaje("No hay conexión con la base de datos.");
+        }
+        return respuesta;
+    }
+
     public static Respuesta registrarConsulta(Consulta consulta) {
         Respuesta respuesta = new Respuesta();
         respuesta.setError(true);

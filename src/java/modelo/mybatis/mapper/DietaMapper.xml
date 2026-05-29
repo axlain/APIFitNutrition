@@ -49,15 +49,13 @@
         nombre,
         total_calorias,
         observaciones,
-        asignada,
-        id_medico
+        asignada
         )
         VALUES (
         #{nombre},
         0,
         #{observaciones},
-        0,
-        #{idMedico}
+        0
         );
     </insert>
 
@@ -98,5 +96,10 @@
         FROM consulta c
         WHERE c.id_dieta = d.id_dieta
     );
-</update>
+    </update>
+    
+    <delete id="eliminar" parameterType="int">
+        DELETE FROM dieta
+        WHERE id_dieta = #{idDieta};
+    </delete>
 </mapper>

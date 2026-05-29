@@ -26,6 +26,23 @@ public class AlimentoImp {
         return alimentos;
     }
 
+    public static List<pojo.UnidadPorcion> obtenerUnidades() {
+        List<pojo.UnidadPorcion> unidades = new ArrayList<>();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                unidades = conexionBD.selectList("alimento.obtener-unidades");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return unidades;
+    }
+
     public static List<Alimento> buscar(String filtro) {
         List<Alimento> alimentos = new ArrayList<>();
         SqlSession conexionBD = MyBatisUtil.getSession();

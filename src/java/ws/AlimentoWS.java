@@ -27,6 +27,13 @@ public class AlimentoWS {
         return AlimentoImp.obtenerActivos();
     }
 
+    @Path("unidades")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<pojo.UnidadPorcion> obtenerUnidades() {
+        return AlimentoImp.obtenerUnidades();
+    }
+
     @Path("buscar")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

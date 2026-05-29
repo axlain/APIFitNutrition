@@ -8,6 +8,7 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -18,6 +19,37 @@ import pojo.Consulta;
 
 @Path("consulta")
 public class ConsultaWS {
+
+    @GET
+    @Path("obtener-todas")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Consulta> obtenerTodas() {
+        return ConsultaImp.obtenerTodas();
+    }
+
+    @PUT
+    @Path("editar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Respuesta editar(String jsonInput) {
+        if (jsonInput == null || jsonInput.isEmpty()) {
+            throw new WebApplicationException(
+                    Response.status(Response.Status.BAD_REQUEST)
+                            .entity("{\"error\": true, \"mensaje\": \"El cuerpo de la solicitud no puede estar vacío.\"}")
+                            .build()
+            );
+        }
+        try {
+            Gson gson = new Gson();
+            Consulta consulta = gson.fromJson(jsonInput, Consulta.class);
+            return ConsultaImp.editar(consulta);
+        } catch (Exception e) {
+            Respuesta resFail = new Respuesta();
+            resFail.setError(true);
+            resFail.setMensaje("Error al procesar la solicitud JSON: " + e.getMessage());
+            return resFail;
+        }
+    }
 
     @POST
     @Path("registrar")

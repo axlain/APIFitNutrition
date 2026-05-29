@@ -6,6 +6,7 @@ import dto.Respuesta;
 import java.util.List;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -98,5 +99,16 @@ public class DietaWS {
         } catch (Exception e) {
             throw new BadRequestException("JSON inválido para editar dieta.");
         }
+    }
+
+    @DELETE
+    @Path("eliminar/{idDieta}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Respuesta eliminar(@PathParam("idDieta") Integer idDieta) {
+        if (idDieta == null || idDieta <= 0) {
+            throw new BadRequestException("El id de la dieta es obligatorio para eliminarla.");
+        }
+
+        return DietaImp.eliminar(idDieta);
     }
 }

@@ -76,11 +76,7 @@ public class DietaImp {
                     return respuesta;
                 }
 
-                if (dieta.getIdMedico() == null || dieta.getIdMedico() <= 0) {
-                    respuesta.setError(true);
-                    respuesta.setMensaje("Debe seleccionar un médico para la dieta.");
-                    return respuesta;
-                }
+
 
                 conexionBD.insert("dieta.registrar", dieta);
 
@@ -147,6 +143,52 @@ public class DietaImp {
                 conexionBD.rollback();
                 respuesta.setError(true);
                 respuesta.setMensaje("Error al editar la dieta: " + e.getMessage());
+            } finally {
+                conexionBD.close();
+            }
+        } else {
+            respuesta.setError(true);
+            respuesta.setMensaje("No hay conexión con la base de datos.");
+        }
+
+        return respuesta;
+    }
+
+    public static Respuesta eliminar(Integer idDieta) {
+        Respuesta respuesta = new Respuesta();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                if (idDieta == null || idDieta <= 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("No se recibió el identificador de la dieta a eliminar.");
+                    return respuesta;
+                }
+
+                boolean dietaEnUso = verificarInmutabilidad(idDieta, conexionBD);
+
+                if (dietaEnUso) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("Esta dieta ya fue asignada a un paciente (consulta) y no puede ser eliminada.");
+                    return respuesta;
+                }
+
+                int filasAfectadas = conexionBD.delete("dieta.eliminar", idDieta);
+                conexionBD.commit();
+
+                if (filasAfectadas > 0) {
+                    respuesta.setError(false);
+                    respuesta.setMensaje("Dieta eliminada correctamente.");
+                } else {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("No se encontró la dieta a eliminar.");
+                }
+
+            } catch (Exception e) {
+                conexionBD.rollback();
+                respuesta.setError(true);
+                respuesta.setMensaje("Error al eliminar la dieta: " + e.getMessage());
             } finally {
                 conexionBD.close();
             }

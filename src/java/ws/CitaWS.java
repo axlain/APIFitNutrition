@@ -85,4 +85,21 @@ public class CitaWS {
         }
         return CitaImp.obtenerVigentesPaciente(idPaciente);
     }
+
+    @Path("obtener-todas")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Cita> obtenerTodas() {
+        return CitaImp.obtenerTodas();
+    }
+
+    @Path("obtener-por-fecha/{fecha}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Cita> obtenerPorFecha(@PathParam("fecha") String fecha) {
+        if (fecha == null || fecha.trim().isEmpty()) {
+            throw new BadRequestException("La fecha es obligatoria.");
+        }
+        return CitaImp.obtenerPorFecha(fecha);
+    }
 }
