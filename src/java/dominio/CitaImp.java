@@ -272,6 +272,48 @@ public class CitaImp {
         return citas;
     }
 
+    public static List<Cita> obtenerTodas() {
+        List<Cita> citas = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                conexionBD.update("cita.marcar-ausentes-automatico");
+                conexionBD.commit();
+
+                citas = conexionBD.selectList("cita.obtener-todas");
+            } catch (Exception e) {
+                conexionBD.rollback();
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return citas;
+    }
+
+    public static List<Cita> obtenerPorFecha(String fecha) {
+        List<Cita> citas = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                conexionBD.update("cita.marcar-ausentes-automatico");
+                conexionBD.commit();
+
+                citas = conexionBD.selectList("cita.obtener-por-fecha", fecha);
+            } catch (Exception e) {
+                conexionBD.rollback();
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return citas;
+    }
+
     public static List<Cita> obtenerVigentesPaciente(Integer idPaciente) {
         List<Cita> citas = null;
         SqlSession conexionBD = MyBatisUtil.getSession();

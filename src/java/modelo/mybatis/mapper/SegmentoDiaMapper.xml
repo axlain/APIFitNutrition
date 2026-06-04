@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="segmentoDia">
+
+    <select id="obtener-todos" resultType="pojo.SegmentoDia">
+        SELECT
+            id_segmento AS idSegmento,
+            nombre AS nombre
+        FROM segmento_dia
+        ORDER BY id_segmento ASC;
+    </select>
+
+</mapper>

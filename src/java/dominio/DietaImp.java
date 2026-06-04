@@ -117,6 +117,7 @@ public class DietaImp {
 
                 respuesta.setError(false);
                 respuesta.setMensaje("Dieta registrada correctamente.");
+                respuesta.setIdGenerado(dieta.getIdDieta());
 
             } catch (Exception e) {
                 conexionBD.rollback();

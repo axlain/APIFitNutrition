@@ -63,14 +63,19 @@
             -- Datos del Médico
             m.numero_personal AS "medico.numeroPersonal",
             mu.nombre AS "medico.usuario.nombre",
-            mu.apellido_paterno AS "medico.usuario.apellidoPaterno"
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno",
+
+            -- Datos de la Dieta
+            d.id_dieta AS "dieta.idDieta",
+            d.nombre AS "dieta.nombre"
 
         FROM consulta c
         INNER JOIN paciente p ON c.id_paciente = p.id_paciente
         INNER JOIN usuario pu ON p.id_usuario = pu.id_usuario
         INNER JOIN medico m ON c.id_medico = m.id_medico
         INNER JOIN usuario mu ON m.id_usuario = mu.id_usuario
-        
+        LEFT JOIN dieta d ON c.id_dieta = d.id_dieta
+
         <where>
             <if test="idConsulta != null">
                 AND c.id_consulta = #{idConsulta}

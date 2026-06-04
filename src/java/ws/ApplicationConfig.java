@@ -38,6 +38,7 @@ public class ApplicationConfig extends Application {
         resources.add(ws.DomicilioWS.class);
         resources.add(ws.MedicoWS.class);
         resources.add(ws.PacienteWS.class);
+        resources.add(ws.SegmentoDiaWS.class);
         resources.add(ws.UsuarioWS.class);
     }
     
