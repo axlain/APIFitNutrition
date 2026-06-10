@@ -16,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import pojo.Alimento;
+import pojo.UnidadPorcion;
 
 @Path("alimento")
 public class AlimentoWS {
@@ -173,5 +174,12 @@ public class AlimentoWS {
         }
 
         return AlimentoImp.darBaja(idAlimento);
+    }
+    
+    @GET
+    @Path("unidades")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<UnidadPorcion> obtenerUnidades() {
+        return AlimentoImp.obtenerUnidades();
     }
 }

@@ -95,7 +95,8 @@
         SET
             nombre = #{nombre},
             porcion = #{porcion},
-            calorias_por_porcion = #{caloriasPorPorcion}
+            calorias_por_porcion = #{caloriasPorPorcion},
+            id_unidad_porcion = #{idUnidadPorcion}
         WHERE id_alimento = #{idAlimento};
     </update>
 
@@ -103,5 +104,13 @@
         DELETE FROM alimento
         WHERE id_alimento = #{idAlimento};
     </delete>
+    
+    <select id="obtener-unidades" resultType="pojo.UnidadPorcion">
+        SELECT
+            id_unidad_porcion AS idUnidadPorcion,
+            nombre
+        FROM unidad_porcion
+        ORDER BY nombre;
+    </select>
 
 </mapper>

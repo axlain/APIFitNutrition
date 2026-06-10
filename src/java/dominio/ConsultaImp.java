@@ -12,18 +12,16 @@ import pojo.Consulta;
 public class ConsultaImp {
 
     public static Respuesta registrarConsulta(Consulta consulta) {
-        Respuesta respuesta = validarDatosMedicas(consulta);
+        Respuesta respuesta = validarDatosConsulta(consulta);
         if (respuesta.isError()) {
             return respuesta;
         }
 
-        // Aplicar regla de negocio: Calcular IMC
         consulta.setImc(calcularImc(consulta.getPeso(), consulta.getEstatura()));
 
         SqlSession conexionBD = MyBatisUtil.getSession();
         if (conexionBD != null) {
             try {
-                // Regla: Marcar dieta como asignada
                 if (consulta.getIdDieta() != null && consulta.getIdDieta() > 0) {
                     conexionBD.update("dieta.marcar-asignada", consulta.getIdDieta());
                 }
@@ -31,7 +29,6 @@ public class ConsultaImp {
                 int filasAfectadas = conexionBD.insert("consulta.registrar", consulta);
 
                 if (filasAfectadas > 0) {
-                    // Regla: Si proviene de una cita, actualizar estatus a "Asistida" (5)
                     if (consulta.getIdCita() != null && consulta.getIdCita() > 0) {
                         conexionBD.update("consulta.marcar-cita-asistida", consulta.getIdCita());
                     }
@@ -52,27 +49,27 @@ public class ConsultaImp {
         } else {
             respuesta.setMensaje("Error al conectar con la base de datos.");
         }
+
         return respuesta;
     }
 
     public static Respuesta editarConsulta(Consulta consulta) {
-        Respuesta respuesta = new Respuesta();
-        respuesta.setError(true);
+        Respuesta respuesta = validarDatosConsulta(consulta);
+        if (respuesta.isError()) {
+            return respuesta;
+        }
 
         if (consulta.getIdConsulta() == null || consulta.getIdConsulta() <= 0) {
+            respuesta.setError(true);
             respuesta.setMensaje("El ID de la consulta es obligatorio para editar.");
             return respuesta;
         }
 
-        // Regla: Recalcular IMC si se actualizan las medidas
-        if (consulta.getPeso() != null && consulta.getEstatura() != null) {
-            consulta.setImc(calcularImc(consulta.getPeso(), consulta.getEstatura()));
-        }
+        consulta.setImc(calcularImc(consulta.getPeso(), consulta.getEstatura()));
 
         SqlSession conexionBD = MyBatisUtil.getSession();
         if (conexionBD != null) {
             try {
-                // Regla: Si se asigna una nueva dieta, marcarla
                 if (consulta.getIdDieta() != null && consulta.getIdDieta() > 0) {
                     conexionBD.update("dieta.marcar-asignada", consulta.getIdDieta());
                 }
@@ -96,6 +93,7 @@ public class ConsultaImp {
         } else {
             respuesta.setMensaje("Error al conectar con la base de datos.");
         }
+
         return respuesta;
     }
 
@@ -115,7 +113,6 @@ public class ConsultaImp {
                 parametros.put("idCita", idCita);
                 parametros.put("motivoCancelacion", motivoCancelacion);
 
-                // Actualiza estatus a 3 (Cancelada) y guarda el motivo
                 int filasAfectadas = conexionBD.update("consulta.cancelar-cita", parametros);
 
                 if (filasAfectadas > 0) {
@@ -135,30 +132,25 @@ public class ConsultaImp {
         } else {
             respuesta.setMensaje("Error al conectar con la base de datos.");
         }
+
         return respuesta;
     }
 
-    public static List<Consulta> buscarConsultas(Integer idConsulta, Integer idPaciente, Integer idMedico, String fecha) {
-        List<Consulta> lista = new ArrayList<>();
+    public static Consulta buscarConsulta(Integer idConsulta) {
+        Consulta consulta = null;
         SqlSession conexionBD = MyBatisUtil.getSession();
 
         if (conexionBD != null) {
             try {
-                // Preparamos los parámetros de búsqueda dinámica
-                Map<String, Object> parametros = new HashMap<>();
-                parametros.put("idConsulta", idConsulta);
-                parametros.put("idPaciente", idPaciente);
-                parametros.put("idMedico", idMedico);
-                parametros.put("fecha", fecha);
-
-                lista = conexionBD.selectList("consulta.buscar", parametros);
+                consulta = conexionBD.selectOne("consulta.buscar", idConsulta);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 conexionBD.close();
             }
         }
-        return lista;
+
+        return consulta;
     }
 
     public static List<Consulta> obtenerHistorialPaciente(Integer idPaciente) {
@@ -174,6 +166,24 @@ public class ConsultaImp {
                 conexionBD.close();
             }
         }
+
+        return historial;
+    }
+    
+    public static List<Consulta> obtenerHistorialMedico(Integer idMedico) {
+        List<Consulta> historial = new ArrayList<>();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                historial = conexionBD.selectList("consulta.obtener-historial-medico", idMedico);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
         return historial;
     }
 
@@ -190,34 +200,71 @@ public class ConsultaImp {
                 conexionBD.close();
             }
         }
+
         return detalle;
     }
-    
+
     private static Double calcularImc(Double peso, Double estatura) {
         if (peso != null && estatura != null && estatura > 0) {
             double imc = peso / Math.pow(estatura, 2);
             return Math.round(imc * 100.0) / 100.0;
         }
+
         return null;
     }
 
-    /**
-     * Valida que los datos obligatorios para medidas estén presentes.
-     */
-    private static Respuesta validarDatosMedicas(Consulta consulta) {
+    private static Respuesta validarDatosConsulta(Consulta consulta) {
         Respuesta respuesta = new Respuesta();
         respuesta.setError(false);
+
+        if (consulta == null) {
+            respuesta.setError(true);
+            respuesta.setMensaje("Los datos de la consulta son obligatorios.");
+            return respuesta;
+        }
+
+        if (consulta.getFecha() == null || consulta.getFecha().trim().isEmpty()) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La fecha de la consulta es obligatoria.");
+            return respuesta;
+        }
+
+        if (consulta.getHora() == null || consulta.getHora().trim().isEmpty()) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La hora de la consulta es obligatoria.");
+            return respuesta;
+        }
 
         if (consulta.getPeso() == null || consulta.getPeso() <= 0) {
             respuesta.setError(true);
             respuesta.setMensaje("El peso es obligatorio y debe ser mayor a 0.");
             return respuesta;
         }
+
         if (consulta.getEstatura() == null || consulta.getEstatura() <= 0) {
             respuesta.setError(true);
             respuesta.setMensaje("La estatura es obligatoria y debe ser mayor a 0.");
             return respuesta;
         }
+
+        if (consulta.getTalla() == null || consulta.getTalla().trim().isEmpty()) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La talla es obligatoria.");
+            return respuesta;
+        }
+
+        if (consulta.getIdPaciente() == null || consulta.getIdPaciente() <= 0) {
+            respuesta.setError(true);
+            respuesta.setMensaje("El paciente es obligatorio.");
+            return respuesta;
+        }
+
+        if (consulta.getIdMedico() == null || consulta.getIdMedico() <= 0) {
+            respuesta.setError(true);
+            respuesta.setMensaje("El médico es obligatorio.");
+            return respuesta;
+        }
+
         return respuesta;
     }
 }

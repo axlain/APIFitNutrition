@@ -118,11 +118,6 @@
             SELECT da2.id_dieta
             FROM dieta_alimento da2
             WHERE da2.id_alimento = #{idAlimento}
-        )
-        AND NOT EXISTS (
-            SELECT 1
-            FROM consulta c
-            WHERE c.id_dieta = d.id_dieta
         );
     </update>
 

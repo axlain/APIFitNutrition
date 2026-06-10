@@ -1,8 +1,10 @@
 package pojo;
 
 public class Consulta {
+
     private Integer idConsulta;
-    private String fechaHora;
+    private String fecha;
+    private String hora;
     private Double peso;
     private Double estatura;
     private String talla;
@@ -15,15 +17,18 @@ public class Consulta {
     private Integer idMedico;
     private Medico medico;
     private Integer idDieta;
-    private Dieta dieta; 
-    private Integer idCita; 
-           
+    private Dieta dieta;
+    private Integer idCita;
+
     public Consulta() {
     }
 
-    public Consulta(Integer idConsulta, String fechaHora, Double peso, Double estatura, String talla, Double imc, String observaciones, Integer idPaciente, Paciente paciente, Integer idMedico, Medico medico, Integer idDieta, Dieta dieta, Integer idCita) {
+    public Consulta(Integer idConsulta, String fecha, String hora, Double peso, Double estatura, String talla,
+                    Double imc, String observaciones, Integer idPaciente, Paciente paciente,
+                    Integer idMedico, Medico medico, Integer idDieta, Dieta dieta, Integer idCita) {
         this.idConsulta = idConsulta;
-        this.fechaHora = fechaHora;
+        this.fecha = fecha;
+        this.hora = hora;
         this.peso = peso;
         this.estatura = estatura;
         this.talla = talla;
@@ -46,12 +51,20 @@ public class Consulta {
         this.idConsulta = idConsulta;
     }
 
-    public String getFechaHora() {
-        return fechaHora;
+    public String getFecha() {
+        return fecha;
     }
 
-    public void setFechaHora(String fechaHora) {
-        this.fechaHora = fechaHora;
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
     }
 
     public Double getPeso() {
@@ -149,6 +162,4 @@ public class Consulta {
     public void setIdCita(Integer idCita) {
         this.idCita = idCita;
     }
-
-    
 }

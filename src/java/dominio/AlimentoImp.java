@@ -6,6 +6,7 @@ import java.util.List;
 import modelo.mybatis.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
 import pojo.Alimento;
+import pojo.UnidadPorcion;
 
 public class AlimentoImp {
 
@@ -45,6 +46,20 @@ public class AlimentoImp {
         }
 
         return alimentos;
+    }
+    
+    public static List<UnidadPorcion> obtenerUnidades() {
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                return conexionBD.selectList("alimento.obtener-unidades");
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return null;
     }
 
     public static Respuesta registrar(Alimento alimento) {
@@ -241,7 +256,7 @@ public class AlimentoImp {
             return respuesta;
         }
 
-        if (!validarId && (alimento.getIdUnidadPorcion() == null || alimento.getIdUnidadPorcion() <= 0)) {
+        if (alimento.getIdUnidadPorcion() == null || alimento.getIdUnidadPorcion() <= 0) {
             respuesta.setError(true);
             respuesta.setMensaje("Debe seleccionar una unidad de porción.");
             return respuesta;

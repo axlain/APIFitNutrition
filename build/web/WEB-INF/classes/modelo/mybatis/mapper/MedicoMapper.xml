@@ -23,8 +23,6 @@
             u.domicilio AS "usuario.domicilio",
             u.correo AS "usuario.correo",
             u.telefono AS "usuario.telefono",
-            u.fotografia AS "usuario.fotografia",
-            TO_BASE64(u.fotografia) AS "usuario.fotoBase64",
             u.id_rol AS "usuario.idRol",
             u.id_estatus AS "usuario.idEstatus",
 
@@ -68,6 +66,7 @@
     <update id="editar" parameterType="pojo.Medico">
         UPDATE medico
         SET
+            cedula_profesional = #{cedulaProfesional},
             id_usuario = #{idUsuario}
         WHERE id_medico = #{idMedico};
     </update>
@@ -116,8 +115,6 @@
             u.domicilio AS "usuario.domicilio",
             u.correo AS "usuario.correo",
             u.telefono AS "usuario.telefono",
-            u.fotografia AS "usuario.fotografia",
-            TO_BASE64(u.fotografia) AS "usuario.fotoBase64",
             u.id_rol AS "usuario.idRol",
             u.id_estatus AS "usuario.idEstatus",
 
@@ -198,11 +195,14 @@
         SELECT
             m.id_medico AS idMedico,
             m.numero_personal AS numeroPersonal,
+            m.cedula_profesional AS cedulaProfesional,
 
             u.id_usuario AS "usuario.idUsuario",
             u.nombre AS "usuario.nombre",
             u.apellido_paterno AS "usuario.apellidoPaterno",
             u.apellido_materno AS "usuario.apellidoMaterno",
+            u.correo AS "usuario.correo",
+            u.telefono AS "usuario.telefono",
 
             eu.nombre AS "usuario.estatus.nombre"
 

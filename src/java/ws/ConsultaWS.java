@@ -21,9 +21,6 @@ import pojo.Consulta;
 @Path("consulta")
 public class ConsultaWS {
 
-    // ==========================================
-    //           REGISTRAR CONSULTA
-    // ==========================================
     @POST
     @Path("registrar")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -47,28 +44,9 @@ public class ConsultaWS {
                 return respuesta;
             }
 
-            if (consulta.getIdPaciente() == null || consulta.getIdPaciente() <= 0) {
-                respuesta.setError(true);
-                respuesta.setMensaje("El paciente es obligatorio.");
-                return respuesta;
-            }
-
-            if (consulta.getIdMedico() == null || consulta.getIdMedico() <= 0) {
-                respuesta.setError(true);
-                respuesta.setMensaje("El médico es obligatorio.");
-                return respuesta;
-            }
-
-            if (consulta.getTalla() == null || consulta.getTalla().trim().isEmpty()) {
-                respuesta.setError(true);
-                respuesta.setMensaje("La talla es obligatoria.");
-                return respuesta;
-            }
-
-            if (consulta.getTalla().trim().length() > 20) {
-                respuesta.setError(true);
-                respuesta.setMensaje("La talla no puede exceder 20 caracteres.");
-                return respuesta;
+            Respuesta validacion = validarConsultaCompleta(consulta);
+            if (validacion.isError()) {
+                return validacion;
             }
 
             return ConsultaImp.registrarConsulta(consulta);
@@ -78,9 +56,6 @@ public class ConsultaWS {
         }
     }
 
-    // ==========================================
-    //           EDITAR CONSULTA
-    // ==========================================
     @PUT
     @Path("editar")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -98,16 +73,21 @@ public class ConsultaWS {
 
             Consulta consulta = gson.fromJson(jsonInput, Consulta.class);
 
-            if (consulta == null || consulta.getIdConsulta() == null || consulta.getIdConsulta() <= 0) {
+            if (consulta == null) {
+                respuesta.setError(true);
+                respuesta.setMensaje("La información de la consulta es obligatoria.");
+                return respuesta;
+            }
+
+            if (consulta.getIdConsulta() == null || consulta.getIdConsulta() <= 0) {
                 respuesta.setError(true);
                 respuesta.setMensaje("El ID de la consulta es obligatorio para editar.");
                 return respuesta;
             }
 
-            if (consulta.getTalla() != null && consulta.getTalla().trim().length() > 20) {
-                respuesta.setError(true);
-                respuesta.setMensaje("La talla no puede exceder 20 caracteres.");
-                return respuesta;
+            Respuesta validacion = validarConsultaCompleta(consulta);
+            if (validacion.isError()) {
+                return validacion;
             }
 
             return ConsultaImp.editarConsulta(consulta);
@@ -117,9 +97,6 @@ public class ConsultaWS {
         }
     }
 
-    // ==========================================
-    //           CANCELAR CITA ASOCIADA
-    // ==========================================
     @PUT
     @Path("cancelar-cita")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -134,14 +111,18 @@ public class ConsultaWS {
                 return respuesta;
             }
 
-            // Parseamos manualmente el JSON para extraer los parámetros de la cita
             JsonObject json = JsonParser.parseString(jsonInput).getAsJsonObject();
-            
-            Integer idCita = (json.has("idCita") && !json.get("idCita").isJsonNull()) 
-                             ? json.get("idCita").getAsInt() : null;
-                             
-            String motivoCancelacion = (json.has("motivoCancelacion") && !json.get("motivoCancelacion").isJsonNull()) 
-                                       ? json.get("motivoCancelacion").getAsString() : null;
+
+            Integer idCita = null;
+            String motivoCancelacion = null;
+
+            if (json.has("idCita") && !json.get("idCita").isJsonNull()) {
+                idCita = json.get("idCita").getAsInt();
+            }
+
+            if (json.has("motivoCancelacion") && !json.get("motivoCancelacion").isJsonNull()) {
+                motivoCancelacion = json.get("motivoCancelacion").getAsString();
+            }
 
             if (idCita == null || idCita <= 0) {
                 respuesta.setError(true);
@@ -156,25 +137,19 @@ public class ConsultaWS {
         }
     }
 
-    // ==========================================
-    //           BUSCAR CONSULTAS
-    // ==========================================
     @GET
     @Path("buscar")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Consulta> buscarConsultas(
-            @QueryParam("idConsulta") Integer idConsulta,
-            @QueryParam("idPaciente") Integer idPaciente,
-            @QueryParam("idMedico") Integer idMedico,
-            @QueryParam("fecha") String fecha
+    public Consulta buscarConsulta(
+            @QueryParam("idConsulta") Integer idConsulta
     ) {
-        // Los parámetros son opcionales, MyBatis se encarga de ignorar los nulos en el XML
-        return ConsultaImp.buscarConsultas(idConsulta, idPaciente, idMedico, fecha);
+        if (idConsulta == null || idConsulta <= 0) {
+            throw new BadRequestException("El id de la consulta es inválido.");
+        }
+
+        return ConsultaImp.buscarConsulta(idConsulta);
     }
 
-    // ==========================================
-    //        HISTORIAL POR PACIENTE
-    // ==========================================
     @GET
     @Path("historial/{idPaciente}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -187,10 +162,20 @@ public class ConsultaWS {
 
         return ConsultaImp.obtenerHistorialPaciente(idPaciente);
     }
+    
+    @GET
+    @Path("historial-medico/{idMedico}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Consulta> obtenerHistorialMedico(
+            @PathParam("idMedico") Integer idMedico
+    ) {
+        if (idMedico == null || idMedico <= 0) {
+            throw new BadRequestException("El id del médico es inválido.");
+        }
 
-    // ==========================================
-    //        OBTENER DETALLE CONSULTA
-    // ==========================================
+        return ConsultaImp.obtenerHistorialMedico(idMedico);
+    }
+
     @GET
     @Path("obtener/{idConsulta}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -202,5 +187,60 @@ public class ConsultaWS {
         }
 
         return ConsultaImp.obtenerDetalleConsulta(idConsulta);
+    }
+
+    private Respuesta validarConsultaCompleta(Consulta consulta) {
+        Respuesta respuesta = new Respuesta();
+        respuesta.setError(false);
+
+        if (consulta.getFecha() == null || consulta.getFecha().trim().isEmpty()) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La fecha de la consulta es obligatoria.");
+            return respuesta;
+        }
+
+        if (consulta.getHora() == null || consulta.getHora().trim().isEmpty()) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La hora de la consulta es obligatoria.");
+            return respuesta;
+        }
+
+        if (consulta.getIdPaciente() == null || consulta.getIdPaciente() <= 0) {
+            respuesta.setError(true);
+            respuesta.setMensaje("El paciente es obligatorio.");
+            return respuesta;
+        }
+
+        if (consulta.getIdMedico() == null || consulta.getIdMedico() <= 0) {
+            respuesta.setError(true);
+            respuesta.setMensaje("El médico es obligatorio.");
+            return respuesta;
+        }
+
+        if (consulta.getPeso() == null || consulta.getPeso() <= 0) {
+            respuesta.setError(true);
+            respuesta.setMensaje("El peso es obligatorio y debe ser mayor a 0.");
+            return respuesta;
+        }
+
+        if (consulta.getEstatura() == null || consulta.getEstatura() <= 0) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La estatura es obligatoria y debe ser mayor a 0.");
+            return respuesta;
+        }
+
+        if (consulta.getTalla() == null || consulta.getTalla().trim().isEmpty()) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La talla es obligatoria.");
+            return respuesta;
+        }
+
+        if (consulta.getTalla().trim().length() > 20) {
+            respuesta.setError(true);
+            respuesta.setMensaje("La talla no puede exceder 20 caracteres.");
+            return respuesta;
+        }
+
+        return respuesta;
     }
 }

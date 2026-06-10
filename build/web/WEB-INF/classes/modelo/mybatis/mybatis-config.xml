@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
                
                 <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
                  <!-- datos de conexion-->
-                <property name="url" value="jdbc:mysql://localhost:3306/fit_nutrition?serverTimezone=UTC"/>   
+                <property name="url" value="jdbc:mysql://localhost:3306/fit_nutrition?serverTimezone=UTC&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
                 <property name="username" value="fit_nutritionUser"/>    
                 <property name="password" value="password"/>
                 <property name="poolMaximumActiveConnections" value="50"/>
@@ -34,6 +34,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         <mapper resource="modelo/mybatis/mapper/DietaAlimentoMapper.xml"/>
         <mapper resource="modelo/mybatis/mapper/ConsultaMapper.xml"/>
         <mapper resource="modelo/mybatis/mapper/AlimentoMapper.xml"/>
+        <mapper resource="modelo/mybatis/mapper/SegmentoDiaMapper.xml"/>
     </mappers>
 
 </configuration>

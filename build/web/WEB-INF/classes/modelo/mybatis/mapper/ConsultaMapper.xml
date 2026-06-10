@@ -4,20 +4,28 @@
 
 <mapper namespace="consulta">
 
-    <insert id="registrar" parameterType="pojo.Consulta" useGeneratedKeys="true" keyProperty="idConsulta" keyColumn="id_consulta">
+    <insert id="registrar" 
+            parameterType="pojo.Consulta" 
+            useGeneratedKeys="true" 
+            keyProperty="idConsulta" 
+            keyColumn="id_consulta">
+
         INSERT INTO consulta (
-            fecha_hora, 
-            peso, 
-            estatura, 
-            talla, 
-            imc, 
-            observaciones, 
-            id_paciente, 
-            id_medico, 
+            fecha,
+            hora,
+            peso,
+            estatura,
+            talla,
+            imc,
+            observaciones,
+            id_paciente,
+            id_medico,
             id_dieta
         )
         VALUES (
-            NOW(), #{peso},
+            #{fecha},
+            #{hora},
+            #{peso},
             #{estatura},
             #{talla},
             #{imc},
@@ -26,25 +34,31 @@
             #{idMedico},
             #{idDieta}
         );
+
     </insert>
 
     <update id="editar" parameterType="pojo.Consulta">
+
         UPDATE consulta
-        <set>
-            <if test="peso != null">peso = #{peso},</if>
-            <if test="estatura != null">estatura = #{estatura},</if>
-            <if test="talla != null">talla = #{talla},</if>
-            <if test="imc != null">imc = #{imc},</if>
-            <if test="observaciones != null">observaciones = #{observaciones},</if>
-            <if test="idDieta != null">id_dieta = #{idDieta},</if>
-            </set>
+        SET
+            fecha = #{fecha},
+            hora = #{hora},
+            peso = #{peso},
+            estatura = #{estatura},
+            talla = #{talla},
+            imc = #{imc},
+            observaciones = #{observaciones},
+            id_dieta = #{idDieta}
         WHERE id_consulta = #{idConsulta};
+
     </update>
 
-    <select id="buscar" parameterType="map" resultType="pojo.Consulta">
+    <select id="buscar" parameterType="int" resultType="pojo.Consulta">
+
         SELECT
             c.id_consulta AS idConsulta,
-            c.fecha_hora AS fechaHora,
+            c.fecha AS fecha,
+            c.hora AS hora,
             c.peso AS peso,
             c.estatura AS estatura,
             c.talla AS talla,
@@ -54,44 +68,37 @@
             c.id_medico AS idMedico,
             c.id_dieta AS idDieta,
 
-            -- Datos del Paciente
             p.codigo_acceso AS "paciente.codigoAcceso",
             pu.nombre AS "paciente.usuario.nombre",
             pu.apellido_paterno AS "paciente.usuario.apellidoPaterno",
             pu.apellido_materno AS "paciente.usuario.apellidoMaterno",
 
-            -- Datos del Médico
             m.numero_personal AS "medico.numeroPersonal",
             mu.nombre AS "medico.usuario.nombre",
-            mu.apellido_paterno AS "medico.usuario.apellidoPaterno"
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno",
+
+            d.id_dieta AS "dieta.idDieta",
+            d.nombre AS "dieta.nombre"
 
         FROM consulta c
         INNER JOIN paciente p ON c.id_paciente = p.id_paciente
         INNER JOIN usuario pu ON p.id_usuario = pu.id_usuario
         INNER JOIN medico m ON c.id_medico = m.id_medico
         INNER JOIN usuario mu ON m.id_usuario = mu.id_usuario
-        
-        <where>
-            <if test="idConsulta != null">
-                AND c.id_consulta = #{idConsulta}
-            </if>
-            <if test="idPaciente != null">
-                AND c.id_paciente = #{idPaciente}
-            </if>
-            <if test="idMedico != null">
-                AND c.id_medico = #{idMedico}
-            </if>
-            <if test="fecha != null">
-                AND DATE(c.fecha_hora) = #{fecha}
-            </if>
-        </where>
-        ORDER BY c.fecha_hora DESC;
+        LEFT JOIN dieta d ON c.id_dieta = d.id_dieta
+
+        WHERE c.id_consulta = #{idConsulta}
+
+        ORDER BY c.fecha DESC, c.hora DESC;
+
     </select>
 
     <select id="obtener-historial-paciente" parameterType="int" resultType="pojo.Consulta">
+
         SELECT
             c.id_consulta AS idConsulta,
-            c.fecha_hora AS fechaHora,
+            c.fecha AS fecha,
+            c.hora AS hora,
             c.peso AS peso,
             c.estatura AS estatura,
             c.talla AS talla,
@@ -123,15 +130,19 @@
         INNER JOIN medico m ON c.id_medico = m.id_medico
         INNER JOIN usuario mu ON m.id_usuario = mu.id_usuario
         LEFT JOIN dieta d ON c.id_dieta = d.id_dieta
-            
+
         WHERE c.id_paciente = #{idPaciente}
-        ORDER BY c.fecha_hora DESC;
+
+        ORDER BY c.fecha DESC, c.hora DESC;
+
     </select>
 
     <select id="obtener-detalle" parameterType="int" resultType="pojo.Consulta">
+
         SELECT
             c.id_consulta AS idConsulta,
-            c.fecha_hora AS fechaHora,
+            c.fecha AS fecha,
+            c.hora AS hora,
             c.peso AS peso,
             c.estatura AS estatura,
             c.talla AS talla,
@@ -163,21 +174,69 @@
         INNER JOIN medico m ON c.id_medico = m.id_medico
         INNER JOIN usuario mu ON m.id_usuario = mu.id_usuario
         LEFT JOIN dieta d ON c.id_dieta = d.id_dieta
-            
+
         WHERE c.id_consulta = #{idConsulta};
+
+    </select>
+    
+    <select id="obtener-historial-medico" parameterType="int" resultType="pojo.Consulta">
+        SELECT
+            c.id_consulta AS idConsulta,
+            c.fecha AS fecha,
+            c.hora AS hora,
+            c.peso AS peso,
+            c.estatura AS estatura,
+            c.talla AS talla,
+            c.imc AS imc,
+            c.observaciones AS observaciones,
+            c.id_paciente AS idPaciente,
+            c.id_medico AS idMedico,
+            c.id_dieta AS idDieta,
+
+            p.id_paciente AS "paciente.idPaciente",
+            pu.nombre AS "paciente.usuario.nombre",
+            pu.apellido_paterno AS "paciente.usuario.apellidoPaterno",
+            pu.apellido_materno AS "paciente.usuario.apellidoMaterno",
+
+            m.id_medico AS "medico.idMedico",
+            m.numero_personal AS "medico.numeroPersonal",
+            mu.nombre AS "medico.usuario.nombre",
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno",
+            mu.apellido_materno AS "medico.usuario.apellidoMaterno",
+
+            d.id_dieta AS "dieta.idDieta",
+            d.nombre AS "dieta.nombre",
+            d.total_calorias AS "dieta.totalCalorias",
+            d.asignada AS "dieta.asignada"
+
+        FROM consulta c
+        INNER JOIN paciente p ON c.id_paciente = p.id_paciente
+        INNER JOIN usuario pu ON p.id_usuario = pu.id_usuario
+        INNER JOIN medico m ON c.id_medico = m.id_medico
+        INNER JOIN usuario mu ON m.id_usuario = mu.id_usuario
+        LEFT JOIN dieta d ON c.id_dieta = d.id_dieta
+
+        WHERE c.id_medico = #{idMedico}
+
+        ORDER BY c.fecha DESC, c.hora DESC;
     </select>
 
     <update id="marcar-cita-asistida" parameterType="int">
+
         UPDATE cita
         SET id_estado_cita = 5
         WHERE id_cita = #{idCita};
+
     </update>
 
     <update id="cancelar-cita" parameterType="map">
+
         UPDATE cita
-        SET id_estado_cita = 3,
+        SET 
+            id_estado_cita = 3,
             motivo_cancelacion = #{motivoCancelacion}
         WHERE id_cita = #{idCita};
+
     </update>
 
 </mapper>

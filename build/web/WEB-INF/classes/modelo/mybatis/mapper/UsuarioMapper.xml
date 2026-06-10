@@ -141,7 +141,6 @@
             u.domicilio AS domicilio,
             u.correo AS correo,
             u.telefono AS telefono,
-            u.fotografia AS fotografia,
             TO_BASE64(u.fotografia) AS fotoBase64,
             u.id_rol AS idRol,
             u.id_estatus AS idEstatus,
