@@ -230,4 +230,28 @@ public class CitaWS {
 
         return CitaImp.obtenerPorFecha(fecha);
     }
+
+    @Path("horas-disponibles")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> obtenerHorasDisponibles(
+            @QueryParam("idMedico") Integer idMedico,
+            @QueryParam("fecha") String fecha,
+            @QueryParam("idCita") Integer idCita
+    ) {
+
+        if (idMedico == null || idMedico <= 0) {
+            throw new BadRequestException(
+                    "El id del médico es obligatorio."
+            );
+        }
+
+        if (fecha == null || fecha.trim().isEmpty()) {
+            throw new BadRequestException(
+                    "La fecha es obligatoria."
+            );
+        }
+
+        return CitaImp.obtenerHorasDisponibles(idMedico, fecha, idCita);
+    }
 }

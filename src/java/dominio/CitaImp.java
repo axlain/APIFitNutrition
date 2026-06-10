@@ -6,8 +6,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import modelo.mybatis.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
 import pojo.Cita;
@@ -23,8 +26,10 @@ public class CitaImp {
 
     private static final LocalTime HORA_INICIO = LocalTime.of(7, 0);
     private static final LocalTime ULTIMA_HORA_REGISTRO = LocalTime.of(20, 30);
+    private static final int INTERVALO_MINUTOS = 30;
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter FORMATO_HORA_CORTA = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter FORMATO_FECHA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter FORMATO_FECHA_HORA_CORTA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -312,6 +317,50 @@ public class CitaImp {
         }
 
         return citas;
+    }
+
+    public static List<String> obtenerHorasDisponibles(Integer idMedico, String fecha, Integer idCitaExcluir) {
+        List<String> horasDisponibles = new ArrayList<>();
+
+        if (idMedico == null || idMedico <= 0 || fecha == null || fecha.trim().isEmpty()) {
+            return horasDisponibles;
+        }
+
+        try {
+            LocalDate.parse(fecha, FORMATO_FECHA);
+        } catch (DateTimeParseException e) {
+            return horasDisponibles;
+        }
+
+        SqlSession conexionBD = MyBatisUtil.getSession();
+        if (conexionBD == null) {
+            return horasDisponibles;
+        }
+
+        try {
+            HashMap<String, Object> parametros = new HashMap<>();
+            parametros.put("idMedico", idMedico);
+            parametros.put("fecha", fecha);
+            parametros.put("idCita", idCitaExcluir);
+
+            List<String> horasOcupadas = conexionBD.selectList("cita.obtener-horas-ocupadas", parametros);
+            Set<String> ocupadas = new HashSet<>(horasOcupadas);
+
+            LocalTime hora = HORA_INICIO;
+            while (!hora.isAfter(ULTIMA_HORA_REGISTRO)) {
+                String horaTexto = hora.format(FORMATO_HORA_CORTA);
+                if (!ocupadas.contains(horaTexto)) {
+                    horasDisponibles.add(horaTexto);
+                }
+                hora = hora.plusMinutes(INTERVALO_MINUTOS);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            conexionBD.close();
+        }
+
+        return horasDisponibles;
     }
 
     public static List<Cita> obtenerVigentesPaciente(Integer idPaciente) {

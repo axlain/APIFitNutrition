@@ -70,6 +70,17 @@
           </if>;
     </select>
 
+    <select id="obtener-horas-ocupadas" parameterType="map" resultType="string">
+        SELECT DATE_FORMAT(hora, '%H:%i')
+        FROM cita
+        WHERE id_medico = #{idMedico}
+          AND fecha = #{fecha}
+          AND id_estado_cita IN (2, 4)
+          <if test="idCita != null">
+              AND id_cita != #{idCita}
+          </if>;
+    </select>
+
     <select id="obtener-por-medico" parameterType="map" resultType="pojo.Cita">
         SELECT
             c.id_cita AS idCita,
