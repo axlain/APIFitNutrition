@@ -7,6 +7,7 @@ import java.util.List;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -189,12 +190,25 @@ public class PacienteWS {
 
     @Path("actualizar-codigo-acceso/{idPaciente}")
     @PUT
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Respuesta actualizarCodigoAcceso(@PathParam("idPaciente") Integer idPaciente) {
+    public Respuesta actualizarCodigoAcceso(
+            @PathParam("idPaciente") Integer idPaciente,
+            @FormParam("codigoActual") String codigoActual,
+            @FormParam("nuevoCodigo") String nuevoCodigo) {
+
         if (idPaciente == null || idPaciente <= 0) {
             throw new BadRequestException("ID de paciente inválido");
         }
 
-        return PacienteImp.actualizarCodigoAcceso(idPaciente);
+        if (codigoActual == null || !codigoActual.matches("\\d{4}")) {
+            return new Respuesta(true, "El código actual debe tener 4 dígitos.");
+        }
+
+        if (nuevoCodigo == null || !nuevoCodigo.matches("\\d{4}")) {
+            return new Respuesta(true, "El nuevo código debe tener 4 dígitos.");
+        }
+
+        return PacienteImp.actualizarCodigoAcceso(idPaciente, codigoActual, nuevoCodigo);
     }
 }

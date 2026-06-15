@@ -46,7 +46,6 @@
             genero = #{genero},
             correo = #{correo},
             telefono = #{telefono},
-            fotografia = #{fotografia},
             id_rol = #{idRol},
             id_estatus = #{idEstatus},
             id_domicilio = #{idDomicilio}
@@ -238,6 +237,13 @@
             OR u.apellido_materno LIKE CONCAT('%', #{filtro}, '%')
             OR u.correo LIKE CONCAT('%', #{filtro}, '%');
 
+    </select>
+    
+    <select id="correo-disponible" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM usuario
+        WHERE correo = #{correo}
+        AND id_usuario != #{idUsuario}
     </select>
 
 </mapper>

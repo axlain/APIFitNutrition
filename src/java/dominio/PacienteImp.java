@@ -204,14 +204,41 @@ public class PacienteImp {
         return respuesta;
     }
 
-    public static Respuesta actualizarCodigoAcceso(Integer idPaciente) {
+    public static Respuesta actualizarCodigoAcceso(Integer idPaciente, String codigoActual, String nuevoCodigo) {
         Respuesta respuesta = new Respuesta();
         SqlSession conexionBD = MyBatisUtil.getSession();
 
         if (conexionBD != null) {
             try {
+                HashMap<String, Object> parametrosValidacion = new HashMap<>();
+                parametrosValidacion.put("idPaciente", idPaciente);
+                parametrosValidacion.put("codigoActual", codigoActual);
 
-                String nuevoCodigo = generarCodigoUnico(conexionBD);
+                Integer codigoCorrecto = conexionBD.selectOne(
+                        "paciente.verificar-codigo-actual",
+                        parametrosValidacion
+                );
+
+                if (codigoCorrecto == null || codigoCorrecto == 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("El código actual no es correcto.");
+                    return respuesta;
+                }
+
+                HashMap<String, Object> parametrosCodigo = new HashMap<>();
+                parametrosCodigo.put("nuevoCodigo", nuevoCodigo);
+                parametrosCodigo.put("idPaciente", idPaciente);
+
+                Integer existeCodigo = conexionBD.selectOne(
+                        "paciente.verificar-codigo-acceso-otro-paciente",
+                        parametrosCodigo
+                );
+
+                if (existeCodigo != null && existeCodigo > 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("El nuevo código ya está asignado a otro paciente.");
+                    return respuesta;
+                }
 
                 HashMap<String, Object> parametrosUpdate = new HashMap<>();
                 parametrosUpdate.put("idPaciente", idPaciente);
@@ -223,40 +250,24 @@ public class PacienteImp {
                 );
 
                 if (filasAfectadas > 0) {
-
                     conexionBD.commit();
-
                     respuesta.setError(false);
-                    respuesta.setMensaje(
-                            "Código de acceso actualizado correctamente: "
-                            + nuevoCodigo
-                    );
-
+                    respuesta.setMensaje("Código de acceso actualizado correctamente.");
                 } else {
-
                     conexionBD.rollback();
-
                     respuesta.setError(true);
                     respuesta.setMensaje("No existe un paciente con ese identificador.");
                 }
 
             } catch (Exception e) {
-
                 conexionBD.rollback();
-
                 respuesta.setError(true);
-                respuesta.setMensaje(
-                        "Error al actualizar el código de acceso: "
-                        + e.getMessage()
-                );
-
+                respuesta.setMensaje("Error al actualizar el código de acceso: " + e.getMessage());
             } finally {
-
                 conexionBD.close();
             }
 
         } else {
-
             respuesta.setError(true);
             respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
         }

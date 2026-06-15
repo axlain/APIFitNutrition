@@ -11,6 +11,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import pojo.Usuario; // Faltaba importar la clase Usuario
 
@@ -65,5 +66,23 @@ public class UsuarioWS {
         }
         
         throw new BadRequestException("ID de usuario inválido.");
+    }
+    
+    @Path("correo-disponible")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Respuesta correoDisponible(
+            @QueryParam("correo") String correo,
+            @QueryParam("idUsuario") Integer idUsuario) {
+
+        if (correo == null || correo.trim().isEmpty()) {
+            return new Respuesta(true, "El correo es obligatorio.");
+        }
+
+        if (idUsuario == null || idUsuario <= 0) {
+            return new Respuesta(true, "ID de usuario inválido.");
+        }
+
+        return UsuarioImp.correoDisponible(correo.trim(), idUsuario);
     }
 }

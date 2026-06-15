@@ -192,4 +192,19 @@
         SET codigo_acceso = #{nuevoCodigo}
         WHERE id_paciente = #{idPaciente};
     </update>
+    
+    <select id="verificar-codigo-actual" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM paciente
+        WHERE id_paciente = #{idPaciente}
+        AND codigo_acceso = #{codigoActual}
+    </select>
+
+    <select id="verificar-codigo-acceso-otro-paciente" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM paciente
+        WHERE codigo_acceso = #{nuevoCodigo}
+        AND id_paciente != #{idPaciente}
+    </select>
+    
 </mapper>

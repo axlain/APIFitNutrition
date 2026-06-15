@@ -70,6 +70,44 @@ public class UsuarioImp {
 
       return usuario;
    }
+    
+    public static Respuesta correoDisponible(String correo, Integer idUsuario) {
+        Respuesta respuesta = new Respuesta();
+
+        try {
+            MyBatisUtil myBatisUtil = new MyBatisUtil();
+            SqlSession conexion = myBatisUtil.getSession();
+
+            if (conexion != null) {
+                Integer existe = conexion.selectOne(
+                        "usuario.correo-disponible",
+                        new java.util.HashMap<String, Object>() {{
+                            put("correo", correo);
+                            put("idUsuario", idUsuario);
+                        }}
+                );
+
+                if (existe != null && existe > 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("Ya existe otro usuario registrado con ese correo.");
+                } else {
+                    respuesta.setError(false);
+                    respuesta.setMensaje("Correo disponible.");
+                }
+
+                conexion.close();
+            } else {
+                respuesta.setError(true);
+                respuesta.setMensaje("No hay conexión con la base de datos.");
+            }
+
+        } catch (Exception e) {
+            respuesta.setError(true);
+            respuesta.setMensaje("Error al validar correo: " + e.getMessage());
+        }
+
+        return respuesta;
+    }
 
     // MÉTODO AUXILIAR 
     private static boolean existeUsuario(SqlSession conexionBD, int idUsuario) {

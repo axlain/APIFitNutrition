@@ -3,7 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/alasn/Desktop/tareasUv/admon%20sw/APIFitNutrition/src/java/dominio/AdministradorImp.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/modelo/mybatis/mapper/PacienteMapper.xml</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/dominio/UsuarioImp.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/ws/PacienteWS.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/ws/UsuarioWS.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/dominio/PacienteImp.java</file>
+            <file>file:/C:/Admin%20Proyectos/APIFitNutrition/src/java/modelo/mybatis/mapper/UsuarioMapper.xml</file>
         </group>
     </open-files>
 </project-private>
