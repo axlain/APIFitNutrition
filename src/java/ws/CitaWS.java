@@ -211,6 +211,21 @@ public class CitaWS {
 
         return CitaImp.obtenerVigentesPaciente(idPaciente);
     }
+    
+    @Path("obtener-por-paciente/{idPaciente}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Cita> obtenerPorPaciente(
+            @PathParam("idPaciente") Integer idPaciente) {
+
+        if (idPaciente == null || idPaciente <= 0) {
+            throw new BadRequestException(
+                    "El id del paciente es obligatorio."
+            );
+        }
+
+        return CitaImp.obtenerPorPaciente(idPaciente);
+    }
 
     @Path("obtener-todas")
     @GET

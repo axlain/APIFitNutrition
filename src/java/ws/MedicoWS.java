@@ -250,4 +250,15 @@ public class MedicoWS {
             throw new BadRequestException(e.getMessage());
         }
     }
+    
+    @Path("obtener-por-id/{idMedico}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Medico obtenerPorId(@PathParam("idMedico") Integer idMedico) {
+        if (idMedico == null || idMedico <= 0) {
+            throw new BadRequestException("El id del médico es inválido.");
+        }
+
+        return MedicoImp.obtenerPorId(idMedico);
+    }
 }

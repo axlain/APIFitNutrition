@@ -29,6 +29,23 @@ public class MedicoImp {
 
         return medicos;
     }
+    
+    public static Medico obtenerPorId(Integer idMedico) {
+        Medico medico = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                medico = conexionBD.selectOne("medico.obtener-por-id", idMedico);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return medico;
+    }
 
     public static Respuesta registrar(Medico medico) {
         Respuesta respuesta = new Respuesta();

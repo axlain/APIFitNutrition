@@ -453,6 +453,26 @@ public class CitaImp {
 
         return null;
     }
+    
+    public static List<Cita> obtenerPorPaciente(Integer idPaciente) {
+        List<Cita> citas = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                citas = conexionBD.selectList(
+                        "cita.obtener-por-paciente",
+                        idPaciente
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return citas;
+    }
 
     private static boolean validarAnticipacion(LocalDateTime fechaCita) {
         return !fechaCita.isBefore(LocalDateTime.now().plusDays(1));

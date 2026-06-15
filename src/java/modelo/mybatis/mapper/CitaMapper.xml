@@ -266,6 +266,35 @@
           AND TIMESTAMP(c.fecha, c.hora) >= NOW()
         ORDER BY c.fecha ASC, c.hora ASC;
     </select>
+    
+    <select id="obtener-por-paciente" parameterType="int" resultType="pojo.Cita">
+        SELECT
+            c.id_cita AS idCita,
+            c.fecha AS fecha,
+            c.hora AS hora,
+            c.observaciones AS observaciones,
+            c.id_paciente AS idPaciente,
+            c.id_medico AS idMedico,
+            c.id_estado_cita AS idEstadoCita,
+
+            ec.id_estado_cita AS "estadoCita.idEstadoCita",
+            ec.nombre AS "estadoCita.nombre",
+
+            m.id_medico AS "medico.idMedico",
+            um.nombre AS "medico.usuario.nombre",
+            um.apellido_paterno AS "medico.usuario.apellidoPaterno",
+            um.apellido_materno AS "medico.usuario.apellidoMaterno"
+
+        FROM cita c
+        INNER JOIN estado_cita ec
+            ON c.id_estado_cita = ec.id_estado_cita
+        INNER JOIN medico m
+            ON c.id_medico = m.id_medico
+        INNER JOIN usuario um
+            ON m.id_usuario = um.id_usuario
+        WHERE c.id_paciente = #{idPaciente}
+        ORDER BY c.fecha ASC, c.hora ASC;
+    </select>
 
     <update id="marcar-ausentes-automatico">
         UPDATE cita
