@@ -292,7 +292,7 @@
             ON c.id_medico = m.id_medico
         INNER JOIN usuario um
             ON m.id_usuario = um.id_usuario
-        WHERE c.id_paciente = #{idPaciente}
+        WHERE c.id_paciente = #{value}
         ORDER BY c.fecha ASC, c.hora ASC;
     </select>
 
