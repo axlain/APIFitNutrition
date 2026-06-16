@@ -15,6 +15,28 @@
         FROM dieta
         ORDER BY nombre ASC;
     </select>
+    
+    <select id="obtener-por-paciente" parameterType="int" resultType="pojo.Dieta">
+        SELECT
+            d.id_dieta AS idDieta,
+            d.nombre,
+            d.total_calorias AS totalCalorias,
+            d.observaciones,
+            d.asignada,
+            d.id_medico AS idMedico
+        FROM consulta c
+        INNER JOIN dieta d
+            ON c.id_dieta = d.id_dieta
+        WHERE c.id_paciente = #{idPaciente}
+        GROUP BY
+            d.id_dieta,
+            d.nombre,
+            d.total_calorias,
+            d.observaciones,
+            d.asignada,
+            d.id_medico
+        ORDER BY MAX(c.fecha) DESC, MAX(c.hora) DESC;
+    </select>
 
     <select id="buscar" parameterType="string" resultType="pojo.Dieta">
         SELECT

@@ -28,6 +28,17 @@ public class DietaWS {
     public List<Dieta> obtenerTodas() {
         return DietaImp.obtenerTodas();
     }
+    
+    @GET
+    @Path("obtener-por-paciente/{idPaciente}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Dieta> obtenerPorPaciente(@PathParam("idPaciente") Integer idPaciente) {
+        if (idPaciente == null || idPaciente <= 0) {
+            throw new BadRequestException("El id del paciente es inválido.");
+        }
+
+        return DietaImp.obtenerPorPaciente(idPaciente);
+    }
 
     @GET
     @Path("obtener-por-id/{idDieta}")

@@ -24,6 +24,21 @@ public class DietaImp {
 
         return dietas;
     }
+    
+    public static List<Dieta> obtenerPorPaciente(Integer idPaciente) {
+        List<Dieta> dietas = new ArrayList<>();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                dietas = conexionBD.selectList("dieta.obtener-por-paciente", idPaciente);
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return dietas;
+    }
 
     public static List<Dieta> buscar(String filtro) {
         List<Dieta> dietas = new ArrayList<>();
