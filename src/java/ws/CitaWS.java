@@ -172,6 +172,40 @@ public class CitaWS {
             );
         }
     }
+    
+    @Path("cancelar-con-motivo")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Respuesta cancelarConMotivo(String json) {
+        Gson gson = new Gson();
+        Respuesta respuesta = new Respuesta();
+
+        try {
+            if (json == null || json.trim().isEmpty()) {
+                return new Respuesta(true, "El cuerpo de la petición es obligatorio.");
+            }
+
+            Cita cita = gson.fromJson(json, Cita.class);
+
+            if (cita == null) {
+                return new Respuesta(true, "La información de la cita es obligatoria.");
+            }
+
+            if (cita.getIdCita() == null || cita.getIdCita() <= 0) {
+                return new Respuesta(true, "El identificador de la cita es obligatorio.");
+            }
+
+            if (cita.getMotivoCancelacion() == null || cita.getMotivoCancelacion().trim().isEmpty()) {
+                return new Respuesta(true, "El motivo de cancelación es obligatorio.");
+            }
+
+            return CitaImp.cancelarConMotivo(cita);
+
+        } catch (JsonSyntaxException e) {
+            throw new BadRequestException("Formato JSON inválido: " + e.getMessage());
+        }
+    }
 
     @Path("obtener-por-medico")
     @GET

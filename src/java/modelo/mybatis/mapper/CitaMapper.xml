@@ -334,5 +334,13 @@
         FROM medico
         WHERE id_medico = #{value};
     </select>
+    
+    <update id="cancelar-con-motivo" parameterType="pojo.Cita">
+        UPDATE cita
+        SET
+            id_estado_cita = 3,
+            motivo_cancelacion = #{motivoCancelacion}
+        WHERE id_cita = #{idCita}
+    </update>
 
 </mapper>

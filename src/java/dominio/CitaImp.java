@@ -186,6 +186,67 @@ public class CitaImp {
         }
         return actualizarEstatus(cita);
     }
+    
+    public static Respuesta cancelarConMotivo(Cita cita) {
+        Respuesta respuesta = new Respuesta();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+
+                Cita citaBD = conexionBD.selectOne(
+                        "cita.obtener-por-id",
+                        cita.getIdCita()
+                );
+
+                if (citaBD == null) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("La cita no existe.");
+                    return respuesta;
+                }
+
+                LocalDate fechaCita = LocalDate.parse(citaBD.getFecha());
+                LocalDate manana = LocalDate.now().plusDays(1);
+
+                if (fechaCita.isBefore(manana)) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje(
+                            "Solo puedes cancelar una cita con al menos un día de anticipación."
+                    );
+                    return respuesta;
+                }
+
+                int filasAfectadas = conexionBD.update(
+                        "cita.cancelar-con-motivo",
+                        cita
+                );
+
+                conexionBD.commit();
+
+                if (filasAfectadas > 0) {
+                    respuesta.setError(false);
+                    respuesta.setMensaje("Cita cancelada correctamente.");
+                } else {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("No se pudo cancelar la cita.");
+                }
+
+            } catch (Exception e) {
+                conexionBD.rollback();
+                respuesta.setError(true);
+                respuesta.setMensaje(
+                        "Error al cancelar la cita: " + e.getMessage()
+                );
+            } finally {
+                conexionBD.close();
+            }
+        } else {
+            respuesta.setError(true);
+            respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
+        }
+
+        return respuesta;
+    }
 
     public static synchronized Respuesta actualizarEstatus(Cita cita) {
         Respuesta respuesta = new Respuesta();
