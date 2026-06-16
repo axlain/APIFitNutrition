@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import modelo.mybatis.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
+import pojo.Domicilio;
 import pojo.Medico;
 import pojo.Usuario;
 import utilidades.Constantes;
@@ -135,6 +136,18 @@ public class MedicoImp {
                 medico.setIdUsuario(idUsuario);
                 medico.getUsuario().setIdUsuario(idUsuario);
 
+                // Manejar domicilio: actualizar si ya existe, insertar si es nuevo
+                Domicilio domicilio = medico.getUsuario().getDomicilio();
+                if (domicilio != null) {
+                    if (domicilio.getIdDomicilio() != null) {
+                        conexionBD.update("domicilio.editar", domicilio);
+                    } else if (tieneDatosDomicilio(domicilio)) {
+                        conexionBD.insert("domicilio.registrar", domicilio);
+                        Integer idDomicilio = conexionBD.selectOne("domicilio.obtener-id-ultimo");
+                        medico.getUsuario().setIdDomicilio(idDomicilio);
+                    }
+                }
+
                 // Editar usuario
                 conexionBD.update("usuario.editar", medico.getUsuario());
 
@@ -236,6 +249,13 @@ public class MedicoImp {
         return respuesta;
     }
     
+    private static boolean tieneDatosDomicilio(Domicilio domicilio) {
+        return (domicilio.getCalle() != null && !domicilio.getCalle().trim().isEmpty())
+                || (domicilio.getColonia() != null && !domicilio.getColonia().trim().isEmpty())
+                || (domicilio.getMunicipio() != null && !domicilio.getMunicipio().trim().isEmpty())
+                || (domicilio.getEstado() != null && !domicilio.getEstado().trim().isEmpty());
+    }
+
     public static Respuesta cambiarContrasena(Integer idMedico, String contrasenaActual, String nuevaContrasena) {
         Respuesta respuesta = new Respuesta();
         respuesta.setError(true);

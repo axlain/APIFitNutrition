@@ -188,6 +188,16 @@ public class PacienteWS {
         return PacienteImp.buscar(filtro);
     }
 
+    @Path("generar-codigo/{idPaciente}")
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    public Respuesta generarCodigoAcceso(@PathParam("idPaciente") Integer idPaciente) {
+        if (idPaciente == null || idPaciente <= 0) {
+            throw new BadRequestException("ID de paciente inválido");
+        }
+        return PacienteImp.generarCodigoAcceso(idPaciente);
+    }
+
     @Path("actualizar-codigo-acceso/{idPaciente}")
     @PUT
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)

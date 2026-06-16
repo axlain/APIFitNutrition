@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import modelo.mybatis.MyBatisUtil;
 import org.apache.ibatis.session.SqlSession;
+import pojo.Domicilio;
 import pojo.Paciente;
 import utilidades.Constantes;
 
@@ -115,10 +116,22 @@ public class PacienteImp {
 
         if (conexionBD != null) {
             try {
+                // Manejar domicilio: actualizar si ya existe, insertar si es nuevo
+                Domicilio domicilio = paciente.getUsuario().getDomicilio();
+                if (domicilio != null) {
+                    if (domicilio.getIdDomicilio() != null) {
+                        conexionBD.update("domicilio.editar", domicilio);
+                    } else if (tieneDatosDomicilio(domicilio)) {
+                        conexionBD.insert("domicilio.registrar", domicilio);
+                        Integer idDomicilio = conexionBD.selectOne("domicilio.obtener-id-ultimo");
+                        paciente.getUsuario().setIdDomicilio(idDomicilio);
+                    }
+                }
+
                 // Editar los datos generales del usuario asociado
                 conexionBD.update("usuario.editar", paciente.getUsuario());
 
-                // Editar paciente (basado en el mapper anterior, solo actualiza idMedico)
+                // Editar paciente (solo actualiza idMedico)
                 conexionBD.update("paciente.editar", paciente);
 
                 conexionBD.commit();
@@ -276,8 +289,54 @@ public class PacienteImp {
     }
 
     // ==========================================
-    // MÉTODO AUXILIAR PRIVADO
+    // MÉTODOS AUXILIARES PRIVADOS
     // ==========================================
+    private static boolean tieneDatosDomicilio(Domicilio domicilio) {
+        return (domicilio.getCalle() != null && !domicilio.getCalle().trim().isEmpty())
+                || (domicilio.getColonia() != null && !domicilio.getColonia().trim().isEmpty())
+                || (domicilio.getMunicipio() != null && !domicilio.getMunicipio().trim().isEmpty())
+                || (domicilio.getEstado() != null && !domicilio.getEstado().trim().isEmpty());
+    }
+
+    public static Respuesta generarCodigoAcceso(Integer idPaciente) {
+        Respuesta respuesta = new Respuesta();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                String nuevoCodigo = generarCodigoUnico(conexionBD);
+
+                HashMap<String, Object> parametros = new HashMap<>();
+                parametros.put("idPaciente", idPaciente);
+                parametros.put("nuevoCodigo", nuevoCodigo);
+
+                int filasAfectadas = conexionBD.update("paciente.actualizar-codigo-acceso", parametros);
+
+                if (filasAfectadas > 0) {
+                    conexionBD.commit();
+                    respuesta.setError(false);
+                    respuesta.setMensaje("Código de acceso generado correctamente: " + nuevoCodigo);
+                } else {
+                    conexionBD.rollback();
+                    respuesta.setError(true);
+                    respuesta.setMensaje("No existe un paciente con ese identificador.");
+                }
+
+            } catch (Exception e) {
+                conexionBD.rollback();
+                respuesta.setError(true);
+                respuesta.setMensaje("Error al generar el código de acceso: " + e.getMessage());
+            } finally {
+                conexionBD.close();
+            }
+        } else {
+            respuesta.setError(true);
+            respuesta.setMensaje(Constantes.MSJ_ERROR_BD);
+        }
+
+        return respuesta;
+    }
+
     private static String generarCodigoUnico(SqlSession conexionBD) {
         boolean esUnico = false;
         String codigoGenerado = "";

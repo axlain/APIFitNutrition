@@ -55,12 +55,30 @@
             u.nombre AS "usuario.nombre",
             u.apellido_paterno AS "usuario.apellidoPaterno",
             u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_nacimiento AS "usuario.fechaNacimiento",
+            u.genero AS "usuario.genero",
             u.correo AS "usuario.correo",
-            u.telefono AS "usuario.telefono"
+            u.telefono AS "usuario.telefono",
+            u.id_domicilio AS "usuario.idDomicilio",
+
+            d.id_domicilio AS "usuario.domicilio.idDomicilio",
+            d.calle AS "usuario.domicilio.calle",
+            d.numero_exterior AS "usuario.domicilio.numeroExterior",
+            d.colonia AS "usuario.domicilio.colonia",
+            d.municipio AS "usuario.domicilio.municipio",
+            d.estado AS "usuario.domicilio.estado",
+            d.codigo_postal AS "usuario.domicilio.codigoPostal",
+
+            eu.id_estatus AS "usuario.estatus.idEstatus",
+            eu.nombre AS "usuario.estatus.nombre"
 
         FROM medico m
         INNER JOIN usuario u
             ON m.id_usuario = u.id_usuario
+        INNER JOIN estatus_usuario eu
+            ON u.id_estatus = eu.id_estatus
+        LEFT JOIN domicilio d
+            ON u.id_domicilio = d.id_domicilio
         WHERE m.id_medico = #{idMedico};
     </select>
 
