@@ -136,6 +136,20 @@ public class MedicoImp {
                 medico.setIdUsuario(idUsuario);
                 medico.getUsuario().setIdUsuario(idUsuario);
 
+                // Verificar que el correo no este usado por otro usuario (unicidad al editar)
+                HashMap<String, Object> parametrosCorreo = new HashMap<>();
+                parametrosCorreo.put("correo", medico.getUsuario().getCorreo());
+                parametrosCorreo.put("idUsuario", idUsuario);
+                Integer existeCorreo = conexionBD.selectOne(
+                        "usuario.verificar-correo-otro-usuario",
+                        parametrosCorreo
+                );
+                if (existeCorreo != null && existeCorreo > 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("El correo ya está registrado en otro usuario.");
+                    return respuesta;
+                }
+
                 // Manejar domicilio: actualizar si ya existe, insertar si es nuevo
                 Domicilio domicilio = medico.getUsuario().getDomicilio();
                 if (domicilio != null) {

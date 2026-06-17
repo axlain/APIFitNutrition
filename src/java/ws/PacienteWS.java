@@ -27,7 +27,32 @@ public class PacienteWS {
     public List<Paciente> obtenerTodos() {
         return PacienteImp.obtenerTodos();
     }
-    
+
+    @Path("obtener-recientes/{limite}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Paciente> obtenerRecientes(@PathParam("limite") Integer limite) {
+        if (limite == null || limite <= 0) {
+            limite = 3;
+        }
+        return PacienteImp.obtenerRecientes(limite);
+    }
+
+    @Path("obtener-recientes-medico/{idMedico}/{limite}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Paciente> obtenerRecientesMedico(
+            @PathParam("idMedico") Integer idMedico,
+            @PathParam("limite") Integer limite) {
+        if (idMedico == null || idMedico <= 0) {
+            throw new BadRequestException("ID de médico inválido");
+        }
+        if (limite == null || limite <= 0) {
+            limite = 3;
+        }
+        return PacienteImp.obtenerRecientesMedico(idMedico, limite);
+    }
+
     @Path("obtener-por-id/{idPaciente}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

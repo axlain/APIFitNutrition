@@ -96,6 +96,21 @@
 
 
     <!-- ========================================= -->
+    <!-- VERIFICAR CORREO EN OTRO USUARIO (al editar) -->
+    <!-- ========================================= -->
+    <select id="verificar-correo-otro-usuario"
+            parameterType="map"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM usuario
+        WHERE correo = #{correo}
+          AND id_usuario != #{idUsuario};
+
+    </select>
+
+
+    <!-- ========================================= -->
     <!-- OBTENER ID POR CORREO -->
     <!-- ========================================= -->
     <select id="obtener-id-por-correo"

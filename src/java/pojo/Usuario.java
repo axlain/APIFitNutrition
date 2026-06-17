@@ -20,7 +20,9 @@ public class Usuario {
     
     private Integer idDomicilio;
     private Domicilio domicilio;
-    
+
+    private String fechaRegistro;
+
     public Usuario() {
     }
 
@@ -171,5 +173,12 @@ public class Usuario {
         this.domicilio = domicilio;
     }
 
-    
+    public String getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(String fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
 }
