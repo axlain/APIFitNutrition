@@ -31,14 +31,10 @@ public class GeneradorNumeroPersonal {
                 rolAbreviado = "UNK";
         }
 
-        // Primera letra del nombre
-        String inicialNombre = nombre.substring(0, 1).toUpperCase();
-
-        // Primera letra apellido paterno
-        String inicialPaterno = apellidoPaterno.substring(0, 1).toUpperCase();
-
-        // Primera letra apellido materno
-        String inicialMaterno = apellidoMaterno.substring(0, 1).toUpperCase();
+        // Inicial de cada parte, segura ante valores vacios o nulos (p. ej. apellido materno opcional)
+        String inicialNombre = inicial(nombre);
+        String inicialPaterno = inicial(apellidoPaterno);
+        String inicialMaterno = inicial(apellidoMaterno);
 
         // 2 números aleatorios
         Random random = new Random();
@@ -52,5 +48,12 @@ public class GeneradorNumeroPersonal {
                 inicialMaterno,
                 numeros
         );
+    }
+
+    private static String inicial(String texto) {
+        if (texto == null || texto.trim().isEmpty()) {
+            return "X";
+        }
+        return texto.trim().substring(0, 1).toUpperCase();
     }
 }

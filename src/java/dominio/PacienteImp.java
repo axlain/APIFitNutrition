@@ -26,7 +26,40 @@ public class PacienteImp {
         }
         return pacientes;
     }
-    
+
+    public static List<Paciente> obtenerRecientes(int limite) {
+        List<Paciente> pacientes = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+        if (conexionBD != null) {
+            try {
+                pacientes = conexionBD.selectList("paciente.obtener-recientes", limite);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+        return pacientes;
+    }
+
+    public static List<Paciente> obtenerRecientesMedico(int idMedico, int limite) {
+        List<Paciente> pacientes = null;
+        SqlSession conexionBD = MyBatisUtil.getSession();
+        if (conexionBD != null) {
+            try {
+                HashMap<String, Object> parametros = new HashMap<>();
+                parametros.put("idMedico", idMedico);
+                parametros.put("limite", limite);
+                pacientes = conexionBD.selectList("paciente.obtener-recientes-medico", parametros);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+        return pacientes;
+    }
+
     public static Paciente obtenerPorId(Integer idPaciente) {
 
         Paciente paciente = null;
@@ -116,6 +149,20 @@ public class PacienteImp {
 
         if (conexionBD != null) {
             try {
+                // Verificar que el correo no este usado por otro usuario (unicidad al editar)
+                HashMap<String, Object> parametrosCorreo = new HashMap<>();
+                parametrosCorreo.put("correo", paciente.getUsuario().getCorreo());
+                parametrosCorreo.put("idUsuario", paciente.getUsuario().getIdUsuario());
+                Integer existeCorreo = conexionBD.selectOne(
+                        "usuario.verificar-correo-otro-usuario",
+                        parametrosCorreo
+                );
+                if (existeCorreo != null && existeCorreo > 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("El correo ya está registrado en otro usuario.");
+                    return respuesta;
+                }
+
                 // Manejar domicilio: actualizar si ya existe, insertar si es nuevo
                 Domicilio domicilio = paciente.getUsuario().getDomicilio();
                 if (domicilio != null) {

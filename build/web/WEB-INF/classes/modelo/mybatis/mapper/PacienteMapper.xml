@@ -59,6 +59,72 @@
         ORDER BY u.nombre ASC;
     </select>
 
+    <!-- OBTENER PACIENTES RECIENTES (para el dashboard, por fecha de alta) -->
+    <select id="obtener-recientes" parameterType="int" resultType="pojo.Paciente">
+        SELECT
+            p.id_paciente AS idPaciente,
+            p.codigo_acceso AS codigoAcceso,
+            p.id_medico AS idMedico,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_registro AS "usuario.fechaRegistro",
+
+            eu.nombre AS "usuario.estatus.nombre",
+
+            mu.nombre AS "medico.usuario.nombre",
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno"
+
+        FROM paciente p
+        INNER JOIN usuario u
+            ON p.id_usuario = u.id_usuario
+        INNER JOIN estatus_usuario eu
+            ON u.id_estatus = eu.id_estatus
+        INNER JOIN medico m
+            ON p.id_medico = m.id_medico
+        INNER JOIN usuario mu
+            ON m.id_usuario = mu.id_usuario
+
+        ORDER BY u.fecha_registro DESC, u.id_usuario DESC
+        LIMIT #{limite};
+    </select>
+
+    <!-- OBTENER PACIENTES RECIENTES DE UN MEDICO (dashboard del medico) -->
+    <select id="obtener-recientes-medico" parameterType="map" resultType="pojo.Paciente">
+        SELECT
+            p.id_paciente AS idPaciente,
+            p.codigo_acceso AS codigoAcceso,
+            p.id_medico AS idMedico,
+
+            u.id_usuario AS "usuario.idUsuario",
+            u.nombre AS "usuario.nombre",
+            u.apellido_paterno AS "usuario.apellidoPaterno",
+            u.apellido_materno AS "usuario.apellidoMaterno",
+            u.fecha_registro AS "usuario.fechaRegistro",
+
+            eu.nombre AS "usuario.estatus.nombre",
+
+            mu.nombre AS "medico.usuario.nombre",
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno"
+
+        FROM paciente p
+        INNER JOIN usuario u
+            ON p.id_usuario = u.id_usuario
+        INNER JOIN estatus_usuario eu
+            ON u.id_estatus = eu.id_estatus
+        INNER JOIN medico m
+            ON p.id_medico = m.id_medico
+        INNER JOIN usuario mu
+            ON m.id_usuario = mu.id_usuario
+
+        WHERE p.id_medico = #{idMedico}
+
+        ORDER BY u.fecha_registro DESC, u.id_usuario DESC
+        LIMIT #{limite};
+    </select>
+
 
     <!-- ALTA: REGISTRAR PACIENTE -->
     <!-- ========================================= -->
