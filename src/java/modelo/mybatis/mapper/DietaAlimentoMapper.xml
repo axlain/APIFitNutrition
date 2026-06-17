@@ -117,9 +117,9 @@
     <update id="recalcular-calorias-dieta" parameterType="int">
         UPDATE dieta d
         SET d.total_calorias = (
-            SELECT IFNULL(SUM(a.calorias_por_porcion * da.cantidad), 0)
+            SELECT IFNULL(SUM((da.cantidad / a.porcion) * a.calorias_por_porcion), 0)
             FROM dieta_alimento da
-            INNER JOIN alimento a 
+            INNER JOIN alimento a
                 ON da.id_alimento = a.id_alimento
             WHERE da.id_dieta = #{idDieta}
         )

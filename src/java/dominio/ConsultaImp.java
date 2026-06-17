@@ -187,6 +187,23 @@ public class ConsultaImp {
         return historial;
     }
 
+    public static List<Consulta> obtenerTodas() {
+        List<Consulta> lista = new ArrayList<>();
+        SqlSession conexionBD = MyBatisUtil.getSession();
+
+        if (conexionBD != null) {
+            try {
+                lista = conexionBD.selectList("consulta.obtener-todas");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                conexionBD.close();
+            }
+        }
+
+        return lista;
+    }
+
     public static Consulta obtenerDetalleConsulta(Integer idConsulta) {
         Consulta detalle = null;
         SqlSession conexionBD = MyBatisUtil.getSession();

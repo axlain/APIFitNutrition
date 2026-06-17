@@ -221,6 +221,46 @@
         ORDER BY c.fecha DESC, c.hora DESC;
     </select>
 
+    <select id="obtener-todas" resultType="pojo.Consulta">
+        SELECT
+            c.id_consulta AS idConsulta,
+            c.fecha AS fecha,
+            c.hora AS hora,
+            c.peso AS peso,
+            c.estatura AS estatura,
+            c.talla AS talla,
+            c.imc AS imc,
+            c.observaciones AS observaciones,
+            c.id_paciente AS idPaciente,
+            c.id_medico AS idMedico,
+            c.id_dieta AS idDieta,
+
+            p.id_paciente AS "paciente.idPaciente",
+            pu.nombre AS "paciente.usuario.nombre",
+            pu.apellido_paterno AS "paciente.usuario.apellidoPaterno",
+            pu.apellido_materno AS "paciente.usuario.apellidoMaterno",
+
+            m.id_medico AS "medico.idMedico",
+            m.numero_personal AS "medico.numeroPersonal",
+            mu.nombre AS "medico.usuario.nombre",
+            mu.apellido_paterno AS "medico.usuario.apellidoPaterno",
+            mu.apellido_materno AS "medico.usuario.apellidoMaterno",
+
+            d.id_dieta AS "dieta.idDieta",
+            d.nombre AS "dieta.nombre",
+            d.total_calorias AS "dieta.totalCalorias",
+            d.asignada AS "dieta.asignada"
+
+        FROM consulta c
+        INNER JOIN paciente p ON c.id_paciente = p.id_paciente
+        INNER JOIN usuario pu ON p.id_usuario = pu.id_usuario
+        INNER JOIN medico m ON c.id_medico = m.id_medico
+        INNER JOIN usuario mu ON m.id_usuario = mu.id_usuario
+        LEFT JOIN dieta d ON c.id_dieta = d.id_dieta
+
+        ORDER BY c.fecha DESC, c.hora DESC;
+    </select>
+
     <update id="marcar-cita-asistida" parameterType="int">
 
         UPDATE cita

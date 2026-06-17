@@ -138,6 +138,13 @@ public class ConsultaWS {
     }
 
     @GET
+    @Path("obtener-todas")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Consulta> obtenerTodas() {
+        return ConsultaImp.obtenerTodas();
+    }
+
+    @GET
     @Path("buscar")
     @Produces(MediaType.APPLICATION_JSON)
     public Consulta buscarConsulta(

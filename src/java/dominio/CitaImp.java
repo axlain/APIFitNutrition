@@ -499,8 +499,8 @@ public class CitaImp {
             if (fecha.isBefore(LocalDate.now())) {
                 return "No se pueden registrar citas en fechas pasadas.";
             }
-            if (fecha.isEqual(LocalDate.now()) && !fechaHoraCita.isAfter(LocalDateTime.now())) {
-                return "No se pueden agendar citas en horarios que ya han transcurrido.";
+            if (!validarAnticipacion(fechaHoraCita)) {
+                return "La cita debe registrarse con al menos 1 hora de anticipacion.";
             }
             if (hora.isBefore(HORA_INICIO) || hora.isAfter(ULTIMA_HORA_REGISTRO)) {
                 return "La hora de la cita debe estar entre 07:00 y 20:30.";
@@ -536,7 +536,7 @@ public class CitaImp {
     }
 
     private static boolean validarAnticipacion(LocalDateTime fechaCita) {
-        return !fechaCita.isBefore(LocalDateTime.now().plusDays(1));
+        return !fechaCita.isBefore(LocalDateTime.now().plusHours(1));
     }
 
     private static boolean validarHorarioPermitido(LocalDateTime fechaCita) {
