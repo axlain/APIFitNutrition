@@ -269,11 +269,11 @@ public class DietaImp {
     }
 
     private static boolean verificarInmutabilidad(Integer idDieta, SqlSession conexionBD) {
-        Integer totalUsos = conexionBD.selectOne(
-                "dieta.verificar-dieta-en-uso",
+        Integer usosConPacienteActivo = conexionBD.selectOne(
+                "dieta.verificar-dieta-en-uso-paciente-activo",
                 idDieta
         );
 
-        return totalUsos != null && totalUsos > 0;
+        return usosConPacienteActivo != null && usosConPacienteActivo > 0;
     }
 }

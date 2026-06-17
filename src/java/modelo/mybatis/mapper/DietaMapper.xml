@@ -111,6 +111,16 @@
         WHERE id_dieta = #{idDieta};
     </select>
 
+    <select id="verificar-dieta-en-uso-paciente-activo" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM consulta c
+        INNER JOIN paciente p ON c.id_paciente = p.id_paciente
+        INNER JOIN usuario u ON p.id_usuario = u.id_usuario
+        INNER JOIN estatus_usuario eu ON u.id_estatus = eu.id_estatus
+        WHERE c.id_dieta = #{value}
+        AND eu.nombre = 'Activo';
+    </select>
+
     <delete id="eliminar-alimentos" parameterType="int">
         DELETE FROM dieta_alimento
         WHERE id_dieta = #{idDieta};
