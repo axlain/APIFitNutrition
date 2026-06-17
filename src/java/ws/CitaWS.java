@@ -280,10 +280,10 @@ public class CitaWS {
         return CitaImp.obtenerPorFecha(fecha);
     }
 
- @Path("horas-disponibles")
- @GET
- @Produces(MediaType.APPLICATION_JSON)
-    public String obtenerHorasDisponibles(
+    @Path("horas-disponibles")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<String> obtenerHorasDisponibles(
             @QueryParam("idMedico") Integer idMedico,
             @QueryParam("fecha") String fecha,
             @QueryParam("idCita") Integer idCita
@@ -301,7 +301,6 @@ public class CitaWS {
             );
         }
 
-        List<String> horas = CitaImp.obtenerHorasDisponibles(idMedico, fecha, idCita);
-        return new Gson().toJson(horas);
+        return CitaImp.obtenerHorasDisponibles(idMedico, fecha, idCita);
     }
 }
