@@ -237,6 +237,12 @@ public class MedicoImp {
                         idMedico
                 );
 
+                // Cancelar las citas activas a futuro del medico para no dejarlas huerfanas.
+                conexionBD.update(
+                        "cita.cancelar-por-medico",
+                        idMedico
+                );
+
                 conexionBD.commit();
 
                 respuesta.setError(false);
