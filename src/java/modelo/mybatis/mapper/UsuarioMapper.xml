@@ -111,6 +111,35 @@
 
 
     <!-- ========================================= -->
+    <!-- VERIFICAR TELEFONO -->
+    <!-- ========================================= -->
+    <select id="verificar-telefono"
+            parameterType="string"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM usuario
+        WHERE telefono = #{telefono};
+
+    </select>
+
+
+    <!-- ========================================= -->
+    <!-- VERIFICAR TELEFONO EN OTRO USUARIO (al editar) -->
+    <!-- ========================================= -->
+    <select id="verificar-telefono-otro-usuario"
+            parameterType="map"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM usuario
+        WHERE telefono = #{telefono}
+          AND id_usuario != #{idUsuario};
+
+    </select>
+
+
+    <!-- ========================================= -->
     <!-- OBTENER ID POR CORREO -->
     <!-- ========================================= -->
     <select id="obtener-id-por-correo"
