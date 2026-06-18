@@ -109,6 +109,17 @@ public class PacienteImp {
                     return respuesta;
                 }
 
+                // 2.1 Verificar teléfono
+                Integer existeTelefono = conexionBD.selectOne(
+                        "usuario.verificar-telefono",
+                        paciente.getUsuario().getTelefono()
+                );
+                if (existeTelefono != null && existeTelefono > 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("El teléfono ya se encuentra registrado.");
+                    return respuesta;
+                }
+
                 // 3. Generar código de acceso de 4 dígitos único
                 String codigoAcceso = generarCodigoUnico(conexionBD);
                 paciente.setCodigoAcceso(codigoAcceso);
@@ -160,6 +171,20 @@ public class PacienteImp {
                 if (existeCorreo != null && existeCorreo > 0) {
                     respuesta.setError(true);
                     respuesta.setMensaje("El correo ya está registrado en otro usuario.");
+                    return respuesta;
+                }
+
+                // Verificar que el teléfono no este usado por otro usuario (unicidad al editar)
+                HashMap<String, Object> parametrosTelefono = new HashMap<>();
+                parametrosTelefono.put("telefono", paciente.getUsuario().getTelefono());
+                parametrosTelefono.put("idUsuario", paciente.getUsuario().getIdUsuario());
+                Integer existeTelefono = conexionBD.selectOne(
+                        "usuario.verificar-telefono-otro-usuario",
+                        parametrosTelefono
+                );
+                if (existeTelefono != null && existeTelefono > 0) {
+                    respuesta.setError(true);
+                    respuesta.setMensaje("El teléfono ya está registrado en otro usuario.");
                     return respuesta;
                 }
 
