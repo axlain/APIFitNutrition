@@ -230,6 +230,12 @@ public class PacienteImp {
 
                 if (filasAfectadas > 0) {
 
+                    // Cancelar las citas activas a futuro del paciente dado de baja.
+                    conexionBD.update(
+                            "cita.cancelar-por-paciente",
+                            idPaciente
+                    );
+
                     conexionBD.commit();
 
                     respuesta.setError(false);

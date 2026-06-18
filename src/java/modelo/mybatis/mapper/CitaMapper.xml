@@ -343,4 +343,26 @@
         WHERE id_cita = #{idCita}
     </update>
 
+    <!-- Cancela las citas activas a futuro de un medico (al darlo de baja) -->
+    <update id="cancelar-por-medico" parameterType="int">
+        UPDATE cita
+        SET
+            id_estado_cita = 3,
+            motivo_cancelacion = 'Cancelada por baja del medico'
+        WHERE id_medico = #{idMedico}
+          AND id_estado_cita IN (2, 4)
+          AND fecha >= CURDATE()
+    </update>
+
+    <!-- Cancela las citas activas a futuro de un paciente (al darlo de baja) -->
+    <update id="cancelar-por-paciente" parameterType="int">
+        UPDATE cita
+        SET
+            id_estado_cita = 3,
+            motivo_cancelacion = 'Cancelada por baja del paciente'
+        WHERE id_paciente = #{idPaciente}
+          AND id_estado_cita IN (2, 4)
+          AND fecha >= CURDATE()
+    </update>
+
 </mapper>
